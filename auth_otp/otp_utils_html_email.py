@@ -5,8 +5,8 @@ import smtplib
 
 def send_otp_email(receiver_email, otp, reset_link=None):
     try:
-        sender_email = "anuragprajapati2113@gmail.com"
-        app_password = "ccbh ktkd ppne hgwv"   # ⚠️ Use Gmail App Password
+        sender_email = "trackerexpense.auth@gmail.com"
+        app_password = "bttmmpkydsvyzqzn"   # ⚠️ Use Gmail App Password
 
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
