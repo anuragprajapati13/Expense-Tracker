@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports</title>
-    <link rel="stylesheet" href="/static/css/dashboard-new.css">
-    <link rel="stylesheet" href="/static/css/reports.css">
-    <link rel="stylesheet" href="/static/css/light-theme.css">
-    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
-    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-new.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reports.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/light-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/3d-enhanced.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar-interactive.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="/static/js/theme.js"></script>
-    <script src="/static/js/navbar-interactive.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navbar-interactive.js') }}"></script>
 </head>
 <body>
 <div class="main-container">
@@ -218,9 +218,9 @@
 </div>
 
 <script id="reports-data" type="application/json">{{ reports_data | tojson }}</script>
-<script src="/static/js/3d-interactive.js"></script>
+<script src="{{ url_for('static', filename='js/3d-interactive.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="/static/js/reports-live.js"></script>
+<script src="{{ url_for('static', filename='js/reports-live.js') }}"></script>
 </body>
 </html>
