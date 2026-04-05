@@ -20,6 +20,12 @@ app = Flask(__name__)
 app.config["ENV"] = os.getenv("FLASK_ENV", "production")
 app.config["DEBUG"] = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
+# Session configuration for low memory
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SECURE"] = True if not os.getenv("FLASK_DEBUG") else False
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["PERMANENT_SESSION_LIFETIME"] = 3600  # 1 hour expiry
+
 # Secret key - must be set in production
 secret_key = os.getenv("SECRET_KEY")
 if not secret_key:
@@ -43,6 +49,11 @@ if mongo_uri:
         # Flask-PyMongo needs a DB name in URI path, otherwise mongo.db is None.
         default_db_name = os.getenv("MONGO_DB_NAME", "expense_tracker")
         mongo_uri = urlunsplit((parts.scheme, parts.netloc, f"/{default_db_name}", parts.query, parts.fragment))
+    # Add connection pooling parameters for low memory
+    if "?" in mongo_uri:
+        mongo_uri += "&maxPoolSize=5&minPoolSize=1&maxIdleTimeMS=30000"
+    else:
+        mongo_uri += "?maxPoolSize=5&minPoolSize=1&maxIdleTimeMS=30000"
 else:
     # Fallback to local MongoDB for development only
     if app.config["DEBUG"]:
@@ -100,7 +111,13 @@ def analytics():
 
 
     user_id = session["user_id"]
-    expenses = list(mongo.db.expenses.find({"user_id": user_id}))
+    
+    # Limit to last 1000 expenses to prevent memory overload
+    # Use projection to fetch only needed fields
+    expenses = list(mongo.db.expenses.find(
+        {"user_id": user_id},
+        {"date": 1, "amount": 1, "type": 1, "category": 1}
+    ).sort("date", -1).limit(1000))
 
     total_income = 0
     total_expense = 0
