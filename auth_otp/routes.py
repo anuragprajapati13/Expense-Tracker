@@ -29,12 +29,20 @@ def forgot_password():
         store_otp(email, otp)
 
         try:
-            send_otp_email(email, otp)
+            # send_otp_email returns True on success, False on failure
+            email_sent = send_otp_email(email, otp)
+            
+            if not email_sent:
+                # Email sending failed - show error to user
+                flash('Failed to send OTP. Check server logs or verify email configuration.', 'danger')
+                return render_template('forgot_password.html')
+            
             flash('OTP sent to your email.', 'success')
             return redirect(url_for('otp.verify_otp_route'))
 
-        except Exception:
-            flash('Failed to send OTP. Try again later.', 'danger')
+        except Exception as e:
+            print(f"[ERROR] Unexpected error in forgot_password: {e}")
+            flash(f'Failed to send OTP: {str(e)}', 'danger')
 
     return render_template('forgot_password.html')
 
