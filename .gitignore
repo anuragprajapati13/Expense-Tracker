@@ -47,6 +47,9 @@ venv.bak/
 instance/
 .webassets-cache
 
+# Environment variables (ensure .env is ignored)
+.env
+
 # Database
 *.db
 *.sqlite
