@@ -53,8 +53,8 @@ def send_otp_email(receiver_email, otp):
     import os
     try:
         # Get email credentials from environment variables (REQUIRED)
-        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "").strip()
-        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS", "").strip()
+        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL").strip()
+        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS").strip()
 
         # Validate that both credentials are set
         if not sender_email or not app_password:
