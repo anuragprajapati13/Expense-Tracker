@@ -1,5 +1,7 @@
 import smtplib
 import random
+import socket
+import threading
 from datetime import datetime, timedelta
 from flask import session
 
@@ -47,28 +49,17 @@ def clear_otp():
     session.pop('otp_data', None)
 
 
-# 🔹 Send OTP Email
-
-def send_otp_email(receiver_email, otp):
-    import os
+# 🔹 Send OTP Email (in background thread to avoid timeout)
+def _send_email_background(receiver_email, otp, sender_email, app_password):
+    """Background task to send OTP email without blocking request."""
     try:
-        # Get email credentials from environment variables (REQUIRED)
-        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL").strip()
-        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS").strip()
-
-        # Validate that both credentials are set
-        if not sender_email or not app_password:
-            error_msg = "ERROR: Email credentials not configured. Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in .env"
-            print(error_msg)
-            return False
-
-        # Remove spaces from app password (in case they were accidentally added)
-        app_password = app_password.replace(" ", "")
-
         print(f"[DEBUG] Sending OTP to {receiver_email} from {sender_email}")
         
-        # Connect to Gmail SMTP server
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        # Create socket with 10-second timeout
+        socket_timeout = 10
+        
+        # Connect to Gmail SMTP server with timeout
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=socket_timeout)
         server.starttls()
         
         # Login with sender email and app password
@@ -84,15 +75,47 @@ def send_otp_email(receiver_email, otp):
         server.quit()
         
         print(f"[DEBUG] OTP email sent successfully to {receiver_email}")
-        return True
     except smtplib.SMTPAuthenticationError as e:
         print(f"EMAIL ERROR - Authentication Failed: Check your email/password. Error: {e}")
-        return False
+    except socket.timeout:
+        print(f"EMAIL ERROR - Socket Timeout: Gmail server took too long to respond")
     except smtplib.SMTPException as e:
         print(f"EMAIL ERROR - SMTP Error: {e}")
-        return False
     except Exception as e:
         print(f"EMAIL ERROR - Unexpected Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+def send_otp_email(receiver_email, otp):
+    import os
+    try:
+        # Get email credentials from environment variables (REQUIRED)
+        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "").strip()
+        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS", "").strip()
+
+        # Validate that both credentials are set
+        if not sender_email or not app_password:
+            error_msg = "ERROR: Email credentials not configured. Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in .env"
+            print(error_msg)
+            return False
+
+        # Remove spaces from app password (in case they were accidentally added)
+        app_password = app_password.replace(" ", "")
+
+        # Send email in background thread to avoid request timeout
+        # This returns immediately to the user, then sends email asynchronously
+        email_thread = threading.Thread(
+            target=_send_email_background,
+            args=(receiver_email, otp, sender_email, app_password),
+            daemon=True
+        )
+        email_thread.start()
+        
+        print(f"[DEBUG] Email sending started in background for {receiver_email}")
+        return True
+        
+    except Exception as e:
+        print(f"ERROR - Failed to start email thread: {e}")
         import traceback
         traceback.print_exc()
         return False
