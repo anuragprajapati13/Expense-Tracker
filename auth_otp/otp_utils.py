@@ -1,10 +1,10 @@
-import smtplib
 import random
-import socket
 import threading
 import logging
 from datetime import datetime, timedelta
 from flask import session
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 # Setup logging for email sending
 logging.basicConfig(level=logging.DEBUG)
@@ -54,81 +54,89 @@ def clear_otp():
     session.pop('otp_data', None)
 
 
-# 🔹 Send OTP Email (in background thread to avoid timeout)
-def _send_email_background(receiver_email, otp, sender_email, app_password):
-    """Background task to send OTP email without blocking request."""
+# 🔹 Send OTP Email (using SendGrid - more reliable on cloud)
+def _send_email_background(receiver_email, otp, sender_email, sendgrid_api_key):
+    """Background task to send OTP email using SendGrid."""
     try:
         email_logger.info(f"[BACKGROUND] Starting email send for {receiver_email}")
         print(f"[EMAIL_SEND] Starting OTP email for {receiver_email}")
         
-        # Create socket with 10-second timeout
-        socket_timeout = 10
+        # Create the email message
+        subject = "Your ExpenseTracker OTP"
+        html_content = f"""
+        <html>
+            <body>
+                <h2>ExpenseTracker - Password Reset</h2>
+                <p>Hello,</p>
+                <p>Your One-Time Password (OTP) for password reset is:</p>
+                <h1 style="color: #007bff; letter-spacing: 2px;">{otp}</h1>
+                <p><strong>This OTP is valid for 5 minutes.</strong></p>
+                <p>If you did not request this, please ignore this email.</p>
+                <hr>
+                <p>Best regards,<br>ExpenseTracker Team</p>
+            </body>
+        </html>
+        """
         
-        # Connect to Gmail SMTP server with timeout
-        email_logger.debug(f"Connecting to Gmail SMTP server...")
-        print(f"[EMAIL_SEND] Connecting to Gmail SMTP...")
-        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=socket_timeout)
-        server.starttls()
-        
-        # Login with sender email and app password
-        email_logger.debug(f"Logging in with {sender_email}")
-        print(f"[EMAIL_SEND] Logging in to Gmail...")
-        server.login(sender_email, app_password)
+        text_content = f"""Your ExpenseTracker OTP for password reset is:
 
-        # Construct the email message
-        message = f"""Subject: Your ExpenseTracker OTP\n\nHello,\n\nYour One-Time Password (OTP) for password reset is:\n\n    {otp}\n\nThis OTP is valid for 5 minutes. If you did not request this, please ignore this email.\n\nRegards,\nExpenseTracker Team"""
+{otp}
+
+This OTP is valid for 5 minutes. If you did not request this, please ignore this email.
+
+Regards,
+ExpenseTracker Team"""
+
+        # Create SendGrid message
+        email_logger.debug(f"Creating SendGrid message for {receiver_email}")
+        print(f"[EMAIL_SEND] Creating email message...")
         
-        # Send the email
-        email_logger.debug(f"Sending email message...")
-        print(f"[EMAIL_SEND] Sending email...")
-        server.sendmail(sender_email, receiver_email, message)
-        server.quit()
+        message = Mail(
+            from_email=sender_email,
+            to_emails=receiver_email,
+            subject=subject,
+            plain_text_content=text_content,
+            html_content=html_content
+        )
         
-        email_logger.info(f"✅ SUCCESS: OTP email sent to {receiver_email}")
-        print(f"[EMAIL_SEND] ✅ OTP email sent successfully to {receiver_email}")
+        # Send email via SendGrid
+        email_logger.debug(f"Sending via SendGrid API...")
+        print(f"[EMAIL_SEND] Sending via SendGrid...")
         
-    except smtplib.SMTPAuthenticationError as e:
-        email_logger.error(f"❌ AUTHENTICATION FAILED: {str(e)}")
-        print(f"❌ [EMAIL_ERROR] AUTHENTICATION FAILED - Email: {sender_email}")
-        print(f"   Make sure EXPENSE_TRACKER_EMAIL_PASS is a Gmail App Password (not your regular password)")
-        print(f"   Error: {e}")
-    except socket.timeout:
-        email_logger.error(f"❌ SOCKET TIMEOUT: Gmail server took too long")
-        print(f"❌ [EMAIL_ERROR] SOCKET TIMEOUT - Gmail server not responding")
-    except smtplib.SMTPException as e:
-        email_logger.error(f"❌ SMTP ERROR: {str(e)}")
-        print(f"❌ [EMAIL_ERROR] SMTP Error: {e}")
+        sg = SendGridAPIClient(sendgrid_api_key)
+        response = sg.send(message)
+        
+        email_logger.info(f"✅ SUCCESS: OTP email sent to {receiver_email} (Status: {response.status_code})")
+        print(f"[EMAIL_SEND] ✅ OTP email sent successfully to {receiver_email} (Status: {response.status_code})")
+        
     except Exception as e:
-        email_logger.error(f"❌ UNEXPECTED ERROR: {str(e)}")
-        print(f"❌ [EMAIL_ERROR] Unexpected Error: {e}")
+        email_logger.error(f"❌ SENDGRID ERROR: {str(e)}")
+        print(f"❌ [EMAIL_ERROR] SendGrid Error: {e}")
         import traceback
         traceback.print_exc()
 
 def send_otp_email(receiver_email, otp):
     import os
     try:
-        # Get email credentials from environment variables (REQUIRED)
+        # Get SendGrid API key from environment
+        sendgrid_api_key = os.environ.get("SENDGRID_API_KEY", "").strip()
         sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "").strip()
-        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS", "").strip()
 
-        # Validate that both credentials are set
-        if not sender_email or not app_password:
-            error_msg = "❌ ERROR: Email credentials not configured in Render environment"
+        # Validate that credentials are set
+        if not sendgrid_api_key or not sender_email:
+            error_msg = "❌ ERROR: SendGrid credentials not configured in Render environment"
             email_logger.error(error_msg)
             print(error_msg)
-            print("   Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in Render dashboard")
+            print("   Set SENDGRID_API_KEY and EXPENSE_TRACKER_EMAIL in Render dashboard")
+            print("   Get your SendGrid API key from: https://app.sendgrid.com/settings/api_keys")
             return False
-
-        # Remove spaces from app password (in case they were accidentally added)
-        app_password = app_password.replace(" ", "")
         
         email_logger.info(f"Starting OTP email send for {receiver_email}")
 
         # Send email in background thread to avoid request timeout
-        # This returns immediately to the user, then sends email asynchronously
         email_thread = threading.Thread(
             target=_send_email_background,
-            args=(receiver_email, otp, sender_email, app_password),
+            args=(receiver_email, otp, sender_email, sendgrid_api_key),
             daemon=True
         )
         email_thread.start()
