@@ -52,18 +52,47 @@ def clear_otp():
 def send_otp_email(receiver_email, otp):
     import os
     try:
-        # Set your new email and app password here, or use environment variables for security
-        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "trackerexpense.auth@gmail.com")
-        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS", "bttm mpky dsvy zqzn")
+        # Get email credentials from environment variables (REQUIRED)
+        sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "").strip()
+        app_password = os.environ.get("EXPENSE_TRACKER_EMAIL_PASS", "").strip()
 
+        # Validate that both credentials are set
+        if not sender_email or not app_password:
+            error_msg = "ERROR: Email credentials not configured. Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in .env"
+            print(error_msg)
+            return False
+
+        # Remove spaces from app password (in case they were accidentally added)
+        app_password = app_password.replace(" ", "")
+
+        print(f"[DEBUG] Sending OTP to {receiver_email} from {sender_email}")
+        
+        # Connect to Gmail SMTP server
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
+        
+        # Login with sender email and app password
+        print(f"[DEBUG] Logging in to Gmail...")
         server.login(sender_email, app_password)
 
+        # Construct the email message
         message = f"""Subject: Your ExpenseTracker OTP\n\nHello,\n\nYour One-Time Password (OTP) for password reset is:\n\n    {otp}\n\nThis OTP is valid for 5 minutes. If you did not request this, please ignore this email.\n\nRegards,\nExpenseTracker Team"""
+        
+        # Send the email
+        print(f"[DEBUG] Sending email...")
         server.sendmail(sender_email, receiver_email, message)
         server.quit()
+        
+        print(f"[DEBUG] OTP email sent successfully to {receiver_email}")
         return True
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"EMAIL ERROR - Authentication Failed: Check your email/password. Error: {e}")
+        return False
+    except smtplib.SMTPException as e:
+        print(f"EMAIL ERROR - SMTP Error: {e}")
+        return False
     except Exception as e:
-        print("EMAIL ERROR:", e)
+        print(f"EMAIL ERROR - Unexpected Error: {e}")
+        import traceback
+        traceback.print_exc()
         return False
