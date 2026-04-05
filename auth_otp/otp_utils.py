@@ -1,10 +1,9 @@
 import random
 import threading
 import logging
+import requests
 from datetime import datetime, timedelta
 from flask import session
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 
 # Setup logging for email sending
 logging.basicConfig(level=logging.DEBUG)
@@ -54,14 +53,17 @@ def clear_otp():
     session.pop('otp_data', None)
 
 
-# 🔹 Send OTP Email (using SendGrid - more reliable on cloud)
-def _send_email_background(receiver_email, otp, sender_email, sendgrid_api_key):
-    """Background task to send OTP email using SendGrid."""
+# 🔹 Send OTP Email (using Mailgun - fastest setup, works on Render)
+def _send_email_background(receiver_email, otp, mailgun_domain, mailgun_api_key, sender_email):
+    """Background task to send OTP email using Mailgun API."""
     try:
         email_logger.info(f"[BACKGROUND] Starting email send for {receiver_email}")
         print(f"[EMAIL_SEND] Starting OTP email for {receiver_email}")
         
-        # Create the email message
+        # Mailgun API endpoint
+        url = f"https://api.mailgun.net/v3/{mailgun_domain}/messages"
+        
+        # Email content
         subject = "Your ExpenseTracker OTP"
         html_content = f"""
         <html>
@@ -87,48 +89,64 @@ This OTP is valid for 5 minutes. If you did not request this, please ignore this
 Regards,
 ExpenseTracker Team"""
 
-        # Create SendGrid message
-        email_logger.debug(f"Creating SendGrid message for {receiver_email}")
-        print(f"[EMAIL_SEND] Creating email message...")
+        # Prepare Mailgun request
+        email_logger.debug(f"Preparing Mailgun API request...")
+        print(f"[EMAIL_SEND] Preparing email via Mailgun...")
         
-        message = Mail(
-            from_email=sender_email,
-            to_emails=receiver_email,
-            subject=subject,
-            plain_text_content=text_content,
-            html_content=html_content
-        )
+        auth = ("api", mailgun_api_key)
+        data = {
+            "from": f"ExpenseTracker <{sender_email}>",
+            "to": receiver_email,
+            "subject": subject,
+            "text": text_content,
+            "html": html_content
+        }
         
-        # Send email via SendGrid
-        email_logger.debug(f"Sending via SendGrid API...")
-        print(f"[EMAIL_SEND] Sending via SendGrid...")
+        # Send via Mailgun API
+        email_logger.debug(f"Sending via Mailgun API...")
+        print(f"[EMAIL_SEND] Sending via Mailgun...")
         
-        sg = SendGridAPIClient(sendgrid_api_key)
-        response = sg.send(message)
+        response = requests.post(url, auth=auth, data=data, timeout=10)
         
-        email_logger.info(f"✅ SUCCESS: OTP email sent to {receiver_email} (Status: {response.status_code})")
-        print(f"[EMAIL_SEND] ✅ OTP email sent successfully to {receiver_email} (Status: {response.status_code})")
+        if response.status_code == 200:
+            email_logger.info(f"✅ SUCCESS: OTP email sent to {receiver_email}")
+            print(f"[EMAIL_SEND] ✅ OTP email sent successfully to {receiver_email}")
+        else:
+            email_logger.error(f"❌ Mailgun API Error: {response.status_code} - {response.text}")
+            print(f"❌ [EMAIL_ERROR] Mailgun API returned status {response.status_code}")
+            print(f"   Response: {response.text}")
         
+    except requests.Timeout:
+        email_logger.error(f"❌ TIMEOUT: Mailgun API took too long")
+        print(f"❌ [EMAIL_ERROR] Mailgun API Timeout")
     except Exception as e:
-        email_logger.error(f"❌ SENDGRID ERROR: {str(e)}")
-        print(f"❌ [EMAIL_ERROR] SendGrid Error: {e}")
+        email_logger.error(f"❌ MAILGUN ERROR: {str(e)}")
+        print(f"❌ [EMAIL_ERROR] Mailgun Error: {e}")
         import traceback
         traceback.print_exc()
 
 def send_otp_email(receiver_email, otp):
     import os
     try:
-        # Get SendGrid API key from environment
-        sendgrid_api_key = os.environ.get("SENDGRID_API_KEY", "").strip()
+        # Get Mailgun credentials from environment
+        mailgun_domain = os.environ.get("MAILGUN_DOMAIN", "").strip()
+        mailgun_api_key = os.environ.get("MAILGUN_API_KEY", "").strip()
         sender_email = os.environ.get("EXPENSE_TRACKER_EMAIL", "").strip()
 
         # Validate that credentials are set
-        if not sendgrid_api_key or not sender_email:
-            error_msg = "❌ ERROR: SendGrid credentials not configured in Render environment"
+        if not mailgun_domain or not mailgun_api_key or not sender_email:
+            error_msg = "❌ ERROR: Mailgun credentials not configured in Render environment"
             email_logger.error(error_msg)
             print(error_msg)
-            print("   Set SENDGRID_API_KEY and EXPENSE_TRACKER_EMAIL in Render dashboard")
-            print("   Get your SendGrid API key from: https://app.sendgrid.com/settings/api_keys")
+            print("   Set these in Render dashboard:")
+            print("   - MAILGUN_DOMAIN (e.g., mg.example.com)")
+            print("   - MAILGUN_API_KEY (your API key from Mailgun)")
+            print("   - EXPENSE_TRACKER_EMAIL (sender email)")
+            print("")
+            print("   Get Mailgun credentials:")
+            print("   1. Go to https://mailgun.com/ and sign up (FREE)")
+            print("   2. Verify your domain or use Mailgun sandbox")
+            print("   3. Copy domain and API key")
             return False
         
         email_logger.info(f"Starting OTP email send for {receiver_email}")
@@ -136,7 +154,7 @@ def send_otp_email(receiver_email, otp):
         # Send email in background thread to avoid request timeout
         email_thread = threading.Thread(
             target=_send_email_background,
-            args=(receiver_email, otp, sender_email, sendgrid_api_key),
+            args=(receiver_email, otp, mailgun_domain, mailgun_api_key, sender_email),
             daemon=True
         )
         email_thread.start()
