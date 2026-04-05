@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+    <style>
+        .notifications-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .notifications-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.03));
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .notifications-section:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 
+                0 15px 40px rgba(139, 92, 246, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            transform: translateZ(8px);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            padding-left: 8px;
+            border-left: 3px solid var(--primary-light);
+        }
+
+        .notification-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        .notification-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .notification-row:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        .notification-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .notification-icon.warning {
+            background: rgba(251, 146, 60, 0.15);
+            color: #fb923c;
+        }
+
+        .notification-icon.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .notification-icon.info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+
+        .notification-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: rgba(139, 92, 246, 0.6);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-subtext {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- Interactive Navbar -->
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-wrapper">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Header Section -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div>
+                        <h2>🔔 Notifications</h2>
+                        <p>Stay updated with your financial alerts</p>
+                    </div>
+                    <div class="header-illustration">📢</div>
+                </div>
+            </div>
+
+            <!-- Notifications Container -->
+            <div class="notifications-container">
+                
+                <!-- Unread Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">📌 Unread Alerts</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Budget Alert</p>
+                            <p class="notification-message">Food category has reached 85% of your monthly budget</p>
+                            <span class="notification-time">5 min ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-alert-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Large Transaction</p>
+                            <p class="notification-message">You made a ₹5,000 transaction - highest this week</p>
+                            <span class="notification-time">2 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">✨ Recent Notifications</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Transaction Added</p>
+                            <p class="notification-message">₹2,500 for Groceries added to your expenses</p>
+                            <span class="notification-time">1 hour ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Weekly Report Ready</p>
+                            <p class="notification-message">Your weekly expense summary has been generated</p>
+                            <span class="notification-time">3 hours ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Budget Reset</p>
+                            <p class="notification-message">Monthly budget has been reset for March 2026</p>
+                            <span class="notification-time">Yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Savings Goal Reminder</p>
+                            <p class="notification-message">You're ₹1,200 away from your monthly savings goal</p>
+                            <span class="notification-time">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Archived Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">📋 Older Notifications</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Monthly Summary Available</p>
+                            <p class="notification-message">February 2026 expense summary is ready to review</p>
+                            <span class="notification-time">1 week ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Unusual Spending Pattern</p>
+                            <p class="notification-message">Entertainment spending is 40% higher than usual</p>
+                            <span class="notification-time">2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 3D Interactive Scripts -->
+<script src="/static/js/3d-interactive.js"></script>
+<script>
+    // Add any notification-specific interactivity here
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('%c🔔 Notifications page loaded', 'color: #06b6d4; font-weight: bold;');
+        
+        // Add animation to notification rows on load
+        const notificationRows = document.querySelectorAll('.notification-row');
+        if (typeof gsap !== 'undefined') {
+            gsap.fromTo(notificationRows,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.out' }
+            );
+        }
+    });
+</script>
+
+</body>
+</html>

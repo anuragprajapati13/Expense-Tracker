@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Budget</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/settings.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- Interactive Navbar -->
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-wrapper">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item active" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+
+        <!-- Settings Container -->
+        <div class="settings-container">
+            
+            <!-- Header Section -->
+            <div class="settings-header">
+                <div class="header-content">
+                    <div class="header-text">
+                        <h2>💼 Budget Settings</h2>
+                        <p>Set your target monthly spending limit and track your financial goals</p>
+                    </div>
+                    <div class="header-illustration">
+                        💰📊💹
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            {% if success %}
+            <div class="success-message">
+                <span>✅ {{ success }}</span>
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="error-message">
+                <span>⚠️ {{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Warning Alert (if overspending) removed as requested -->
+
+            <!-- Main Content Grid -->
+            <div class="settings-main">
+                
+                <!-- Budget Input Card -->
+                <div class="budget-input-card">
+                    <h3>📋 Set Your Monthly Budget</h3>
+
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="budget">Monthly Budget (₹)</label>
+                            <input type="number" id="budget" name="budget" placeholder="Enter your monthly budget" step="0.01" value="{{ user_budget }}" required>
+                            <span class="form-hint">Set your target monthly spending limit</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">💾 Save Budget</button>
+                            <a href="/dashboard" class="btn-cancel">❌ Cancel</a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Circular Progress Card -->
+                <div class="progress-card">
+                    <div class="progress-flex-row">
+                        <div class="circular-progress-wrapper">
+                            <div class="circular-progress">
+                                <svg class="progress-svg" viewBox="0 0 160 160">
+                                    <defs>
+                                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#fca5a5;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#fed7aa;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="progress-circle progress-background" cx="80" cy="80" r="70"/>
+                                    <circle class="progress-circle progress-fill" cx="80" cy="80" r="70" id="progressFill"/>
+                                </svg>
+                                <div class="progress-text-inside">
+                                    <div class="progress-percentage" id="progressPercentage">{{ (percentage | int) if percentage else 0 }}%</div>
+                                    <div class="progress-label">Budget Used</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-info-box">
+                            <div class="progress-status-label">Status</div>
+                            {% if current_month_expense > user_budget %}
+                                <div class="progress-status over-budget">
+                                    <span class="status-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                                    <span class="status-message">Over Budget<br><span class="over-budget-amount">Exceeded by ₹{{ (current_month_expense - user_budget) | int }}</span></span>
+                                </div>
+                            {% else %}
+                                <div class="progress-status within-budget">
+                                    <span class="status-icon"><i class="fas fa-check-circle"></i></span>
+                                    <span class="status-message">On Track<br><span class="within-budget-note">Within Budget</span></span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Budget Information Section -->
+            <div class="budget-information">
+                <h3>📌 Budget Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Current Budget</div>
+                        <div class="info-value">₹{{ user_budget | int }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">This Month Spent</div>
+                        <div class="info-value">₹{{ current_month_expense | int }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Remaining Budget</div>
+                        <div class="info-value {% if remaining >= 0 %}positive{% else %}negative{% endif %}">₹{{ remaining | int }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Budget Usage</div>
+                        <div class="info-value">{{ (percentage | int) if percentage else 0 }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Budget Tips Section -->
+            <div class="budget-tips">
+                <h3>💡 Budget Tips</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">💡</div>
+                        <h4>Set a realistic budget</h4>
+                        <p>Set your target goals consisting of ₹1,100</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">📊</div>
+                        <h4>Track your spending</h4>
+                        <p>Track expenses regularly to stay within budget</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🔍</div>
+                        <h4>Review your expenses</h4>
+                        <p>Review spending patterns monthly</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/static/js/settings.js"></script>
+<script src="/static/js/3d-interactive.js"></script>
+
+</body>
+</html>

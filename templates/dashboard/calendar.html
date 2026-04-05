@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - ExpenseTracker</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/calendar.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Theme Script -->
+    <script src="/static/js/theme.js"></script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-container">
+        <div class="main-wrapper">
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                    <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                    <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                    <li><a href="/calendar" class="menu-item active" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+
+                    <!-- FIXED: changed route -->
+                    <li><a href="/analytics" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+
+                    <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+
+                    <li>
+                        <button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn"
+                            title="Logout" type="button"
+                            style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content">
+
+                <!-- Header -->
+                <div class="calendar-header-area">
+                    <h2>📅 Calendar</h2>
+                    <p>View your expenses and payment reminders</p>
+                    <button class="add-reminder-btn" id="addReminderBtn">
+                        <i class="fas fa-bell"></i> Add Payment Reminder
+                    </button>
+                </div>
+
+                <!-- Calendar Section -->
+                <div class="calendar-container">
+
+                    <!-- Calendar -->
+                    <div class="calendar-card">
+                        <div class="calendar-header">
+                            <button id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="monthYear" class="month-year"></h3>
+                            <button id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+
+                        <div class="calendar-weekdays">
+                            <div class="weekday">Sun</div>
+                            <div class="weekday">Mon</div>
+                            <div class="weekday">Tue</div>
+                            <div class="weekday">Wed</div>
+                            <div class="weekday">Thu</div>
+                            <div class="weekday">Fri</div>
+                            <div class="weekday">Sat</div>
+                        </div>
+
+                        <div class="calendar-days" id="calendarDays"></div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="expenses-sidebar">
+                        <div class="expenses-card">
+                            <h3><i class="fas fa-list"></i> For <span id="selectedDate">Today</span></h3>
+
+                            <!-- Reminders -->
+                            <div class="reminders-section">
+                                <h4><i class="fas fa-bell"></i> Payment Reminders</h4>
+                                <div class="reminders-list" id="remindersList">
+                                    <p class="no-items">No payment reminders</p>
+                                </div>
+                            </div>
+
+                            <!-- Expenses -->
+                            <div class="expenses-section">
+                                <h4><i class="fas fa-receipt"></i> Expenses</h4>
+                                <div class="expenses-list" id="expensesList">
+                                    <p class="no-items">No expenses for this date</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div id="reminderModal" class="reminder-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Add Payment Reminder</h2>
+                <button class="modal-close" onclick="closeReminderModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="reminderForm" class="reminder-form">
+
+                    <div class="form-group">
+                        <label>Payment Title *</label>
+                        <input type="text" id="reminderTitle" name="title" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Amount (₹) *</label>
+                            <input type="number" id="reminderAmount" name="amount" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="reminderCategory" name="category">
+                                <option>Bills</option>
+                                <option>Insurance</option>
+                                <option>Loan</option>
+                                <option>Subscription</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reminder Date *</label>
+                        <input type="date" id="reminderDate" name="reminder_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="reminderDesc" name="description"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancel" onclick="closeReminderModal()">Cancel</button>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Save Reminder
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logoutConfirmationModal" class="logout-confirmation-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2><i class="fas fa-sign-out-alt"></i> Confirm Logout</h2>
+            </div>
+
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelLogout" class="modal-btn cancel-btn">Cancel</button>
+                <button id="confirmLogout" class="modal-btn confirm-btn">Logout</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JS (ONLY ONCE) -->
+    <script src="/static/js/navbar-interactive.js"></script>
+    <script src="/static/js/3d-interactive.js"></script>
+    <script src="/static/js/calendar.js"></script>
+
+    <!-- FIX: Added missing function -->
+    <script>
+        function closeReminderModal() {
+            document.getElementById("reminderModal").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>

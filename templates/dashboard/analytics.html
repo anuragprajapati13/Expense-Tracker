@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/reports.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+</head>
+<body>
+<div class="main-container">
+    {% include 'components/navbar-interactive.html' %}
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/analytics" class="menu-item active" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="analytics-container">
+                <div class="analytics-header-card">
+                    <h2 class="analytics-title">Analytics Dashboard <span class="analytics-icon">📊</span></h2>
+                    <p class="analytics-desc">Visualize your financial data with advanced analytics and trends.</p>
+                </div>
+                <!-- Advanced Charts Section (All Charts) -->
+                <div class="advanced-charts-section">
+                    <!-- Removed Advanced Charts section title as requested -->
+                    <div class="advanced-charts-grid">
+                        <div class="glass-card">
+                            <h3>Weekly Spending</h3>
+                            <canvas id="weeklySpendingLineChart"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h3>Category Distribution</h3>
+                            <canvas id="categoryPieChart"></canvas>
+                        </div>
+                        <!-- Removed duplicate Income vs Expenses chart -->
+                        <div class="glass-card">
+                            <h3>Income vs Expense Overview</h3>
+                            <canvas id="incomeExpenseBarChart"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h3>Monthly Savings Trend</h3>
+                            <canvas id="savingsTrendChart"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h3>Monthly Expense Comparison</h3>
+                            <canvas id="monthlyExpenseBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Income vs Expense Bar Chart
+const incomeExpenseBarChart = document.getElementById('incomeExpenseBarChart');
+if (incomeExpenseBarChart) {
+    new Chart(incomeExpenseBarChart, {
+        type: 'bar',
+        data: {
+            labels: ['Income', 'Expense'],
+            datasets: [{
+                label: 'Amount (₹)',
+                data: [{{ income | default(0) | int }}, {{ expense | default(0) | int }}],
+                backgroundColor: [
+                    'rgba(34,197,94,0.7)', // Income - green
+                    'rgba(236,72,153,0.7)' // Expense - pink
+                ],
+                borderColor: [
+                    'rgba(34,197,94,1)',
+                    'rgba(236,72,153,1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 8,
+                maxBarThickness: 60
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a78bfa', font: { weight: 'bold' } },
+                    grid: { color: 'rgba(139,92,246,0.1)' }
+                },
+                x: {
+                    ticks: { color: '#e0e7ff', font: { weight: 'bold' } },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+// Monthly Savings Trend Line Chart
+const savingsTrendChart = document.getElementById('savingsTrendChart');
+if (savingsTrendChart) {
+    new Chart(savingsTrendChart, {
+        type: 'line',
+        data: {
+            labels: Object.keys({{ monthly_income|tojson }}),
+            datasets: [
+                {
+                    label: 'Income',
+                    data: Object.values({{ monthly_income|tojson }}),
+                    borderColor: 'rgba(34,197,94,1)',
+                    backgroundColor: 'rgba(34,197,94,0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Expense',
+                    data: Object.values({{ monthly_expense|tojson }}),
+                    borderColor: 'rgba(236,72,153,1)',
+                    backgroundColor: 'rgba(236,72,153,0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#e0e7ff' } },
+                title: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a78bfa', font: { weight: 'bold' } },
+                    grid: { color: 'rgba(139,92,246,0.1)' }
+                },
+                x: {
+                    ticks: { color: '#e0e7ff', font: { weight: 'bold' } },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+// Removed duplicate Expense by Category doughnut chart script.
+// Monthly Expense Comparison Bar Chart
+const monthlyExpenseBarChart = document.getElementById('monthlyExpenseBarChart');
+if (monthlyExpenseBarChart) {
+    new Chart(monthlyExpenseBarChart, {
+        type: 'bar',
+        data: {
+            labels: Object.keys({{ monthly_expense|tojson }}),
+            datasets: [{
+                label: 'Expense',
+                data: Object.values({{ monthly_expense|tojson }}),
+                backgroundColor: 'rgba(236,72,153,0.7)',
+                borderColor: 'rgba(236,72,153,1)',
+                borderWidth: 2,
+                borderRadius: 8,
+                maxBarThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                title: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a78bfa', font: { weight: 'bold' } },
+                    grid: { color: 'rgba(139,92,246,0.1)' }
+                },
+                x: {
+                    ticks: { color: '#e0e7ff', font: { weight: 'bold' } },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+</script>
+</script>
+<script>
+// --- Advanced Charts Section ---
+// Data from backend
+const weeklyLabels = {{ weekly_labels|tojson }};
+const weeklySpending = {{ weekly_spending|tojson }};
+const categoryLabels = {{ category_labels|tojson }};
+const categoryData = {{ category_values|tojson }};
+const incomeExpenseLabels = ["Income", "Expenses"];
+const incomeExpenseData = {{ income_vs_expense|tojson }};
+
+// Weekly Spending Line Chart
+const weeklySpendingLineChart = document.getElementById('weeklySpendingLineChart');
+if (weeklySpendingLineChart) {
+    new Chart(weeklySpendingLineChart, {
+        type: 'line',
+        data: {
+            labels: weeklyLabels,
+            datasets: [{
+                label: 'Spending (₹)',
+                data: weeklySpending,
+                borderColor: 'rgba(139,92,246,1)',
+                backgroundColor: 'rgba(139,92,246,0.15)',
+                pointBackgroundColor: 'rgba(236,72,153,1)',
+                pointRadius: 6,
+                tension: 0.45,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#e0e7ff' } },
+                tooltip: { enabled: true, backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#a78bfa' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a78bfa', font: { weight: 'bold' } },
+                    grid: { color: 'rgba(139,92,246,0.08)' }
+                },
+                x: {
+                    ticks: { color: '#e0e7ff', font: { weight: 'bold' } },
+                    grid: { display: false }
+                }
+            },
+            animation: { duration: 1200, easing: 'easeInOutQuart' }
+        }
+    });
+}
+// Category Distribution Pie Chart
+const categoryPieChart = document.getElementById('categoryPieChart');
+if (categoryPieChart) {
+    new Chart(categoryPieChart, {
+        type: 'pie',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: [
+                    'rgba(236,72,153,0.8)',
+                    'rgba(59,130,246,0.8)',
+                    'rgba(16,185,129,0.8)',
+                    'rgba(245,158,11,0.8)',
+                    'rgba(139,92,246,0.8)',
+                    'rgba(251,191,36,0.8)'
+                ],
+                borderColor: '#1e293b',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#e0e7ff' } },
+                tooltip: { enabled: true, backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#a78bfa' }
+            },
+            animation: { duration: 1200, easing: 'easeInOutQuart' }
+        }
+    });
+}
+// Income vs Expenses Bar Chart
+const incomeVsExpenseBarChart = document.getElementById('incomeVsExpenseBarChart');
+if (incomeVsExpenseBarChart) {
+    new Chart(incomeVsExpenseBarChart, {
+        type: 'bar',
+        data: {
+            labels: incomeExpenseLabels,
+            datasets: [{
+                label: 'Amount (₹)',
+                data: incomeExpenseData,
+                backgroundColor: [
+                    'rgba(34,197,94,0.8)', // Income
+                    'rgba(236,72,153,0.8)' // Expenses
+                ],
+                borderColor: [
+                    'rgba(34,197,94,1)',
+                    'rgba(236,72,153,1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 10,
+                maxBarThickness: 60
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true, backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#a78bfa' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#a78bfa', font: { weight: 'bold' } },
+                    grid: { color: 'rgba(139,92,246,0.08)' }
+                },
+                x: {
+                    ticks: { color: '#e0e7ff', font: { weight: 'bold' } },
+                    grid: { display: false }
+                }
+            },
+            animation: { duration: 1200, easing: 'easeInOutQuart' }
+        }
+    });
+}
+</script>
+</body>
+</html>

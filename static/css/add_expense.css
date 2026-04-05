@@ -1,0 +1,90 @@
+.form-container {
+    max-width: 500px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8B5CF6;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.form-group input::placeholder,
+.form-group option {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group select option {
+    background: #0f172a;
+    color: white;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn-submit,
+.btn-cancel {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+
+.btn-submit {
+    background: #8B5CF6;
+    color: white;
+}
+
+.btn-submit:hover {
+    background: #7C3AED;
+    box-shadow: 0 0 15px #8B5CF6;
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

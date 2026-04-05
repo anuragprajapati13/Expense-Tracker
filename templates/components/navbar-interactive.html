@@ -1,0 +1,340 @@
+<nav class="navbar-interactive">
+    <!-- Navbar Container -->
+    <div class="navbar-container">
+        <!-- Left Section -->
+        <div class="navbar-left-section">
+            <!-- Logo -->
+            <div class="navbar-logo">
+                <a href="/dashboard" class="logo-link">
+                    <i class="fas fa-wallet"></i>
+                    <span class="logo-text">ExpenseTracker</span>
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        placeholder="Search transactions..."
+                        id="searchInput"
+                    >
+                    <div class="search-suggestions">
+                        <div class="suggestion-item">
+                            <i class="fas fa-history"></i>
+                            <span>Recent searches</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="navbar-right-section">
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <span class="stat-label">💰 Balance</span>
+                    <span class="stat-value">₹{{ balance | default(0) | int }}</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">📊 Spent Today</span>
+                    <span class="stat-value today">₹{{ expense | default(0) | int }}</span>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="navbar-item notifications-wrapper">
+                <button class="icon-button notifications-button" id="notificationsBtn" title="View notifications and alerts">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">{{ unread_notifications|default(0) }}</span>
+                </button>
+                <span class="button-tooltip">Notifications</span>
+
+                <!-- Notifications Dropdown -->
+                <div class="notifications-dropdown" id="notificationsDropdown">
+                    <div class="dropdown-header">
+                        <h3>Notifications</h3>
+                        <button class="close-btn" onclick="this.closest('.notifications-dropdown').classList.remove('active')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="notifications-list">
+                        <div class="notification-item unread">
+                            <div class="notification-icon warning">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-title">Budget Alert</p>
+                                <p class="notification-message">Food category at 85% of budget</p>
+                                <span class="notification-time">5 min ago</span>
+                            </div>
+                        </div>
+
+                        <div class="notification-item unread">
+                            <div class="notification-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-title">Transaction Added</p>
+                                <p class="notification-message">₹2,500 for Groceries</p>
+                                <span class="notification-time">1 hour ago</span>
+                            </div>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-icon info">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <p class="notification-title">Weekly Report Ready</p>
+                                <p class="notification-message">View your weekly expense summary</p>
+                                <span class="notification-time">3 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-footer">
+                        <button class="view-all-link" id="viewAllNotificationsBtn">View All Notifications →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Dropdown -->
+            <div class="navbar-item user-dropdown-wrapper">
+                <button class="user-button" id="userBtn">
+                    <img 
+                        src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=8B5CF6&color=fff&bold=true" 
+                        alt="User Avatar" 
+                        class="user-avatar"
+                    >
+                    <span class="user-name">{{ session.get('user_name', 'User') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+
+                <!-- User Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="dropdown-header">
+                        <div class="user-info">
+                            <img 
+                                src="https://ui-avatars.com/api/?name={{ session.get('user_name', 'User') }}&background=8B5CF6&color=fff&bold=true" 
+                                alt="User Avatar"
+                                class="user-avatar-large"
+                            >
+                            <div>
+                                <p class="user-name-large">{{ session.get('user_name', 'User') }}</p>
+                                <p class="user-email">user@example.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-menu">
+                        <a href="/account-settings" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="/profile" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </a>
+                        <a href="/billing" class="dropdown-item">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Billing</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button id="logoutBtn" class="dropdown-item danger" style="border: none; background: none; cursor: pointer; width: 100%; text-align: left; padding: 12px 20px; display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+
+            <!-- Sidebar Toggle Button -->
+
+            <!-- Theme Toggle -->
+            <div class="navbar-item">
+                <button class="icon-button theme-toggle-btn" id="themeToggle" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="logout-confirmation-modal" id="logoutConfirmationModal">
+        <div class="logout-modal-overlay" id="logoutModalOverlay"></div>
+        <div class="logout-modal-content">
+            <div class="logout-modal-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to logout? You'll need to login again to access your account.</p>
+            <div class="logout-modal-buttons">
+                <button class="logout-btn-cancel" id="cancelLogoutBtn">
+                    <i class="fas fa-times"></i>
+                    No, Stay Here
+                </button>
+                <button class="logout-btn-confirm" id="confirmLogoutBtn">
+                    <i class="fas fa-check"></i>
+                    Yes, Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div class="notifications-modal" id="notificationsModal">
+        <div class="notifications-modal-overlay" id="notificationsOverlay"></div>
+        <div class="notifications-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-bell"></i> All Notifications</h2>
+                <button class="close-modal-btn" id="closeNotificationsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Unread Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">📌 Unread Alerts</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Budget Alert</p>
+                            <p class="notification-message">Food category has reached 85% of your monthly budget</p>
+                            <span class="notification-time">5 min ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-alert-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Large Transaction</p>
+                            <p class="notification-message">You made a ₹5,000 transaction - highest this week</p>
+                            <span class="notification-time">2 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">✨ Recent Notifications</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Transaction Added</p>
+                            <p class="notification-message">₹2,500 for Groceries added to your expenses</p>
+                            <span class="notification-time">1 hour ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Weekly Report Ready</p>
+                            <p class="notification-message">Your weekly expense summary has been generated</p>
+                            <span class="notification-time">3 hours ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Budget Reset</p>
+                            <p class="notification-message">Monthly budget has been reset for March 2026</p>
+                            <span class="notification-time">Yesterday</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Savings Goal Reminder</p>
+                            <p class="notification-message">You're ₹1,200 away from your monthly savings goal</p>
+                            <span class="notification-time">2 days ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Older Notifications -->
+                <div class="notifications-section">
+                    <div class="section-title">📋 Older Notifications</div>
+                    
+                    <div class="notification-row">
+                        <div class="notification-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Monthly Summary Available</p>
+                            <p class="notification-message">February 2026 expense summary is ready to review</p>
+                            <span class="notification-time">1 week ago</span>
+                        </div>
+                    </div>
+
+                    <div class="notification-row">
+                        <div class="notification-icon warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p class="notification-title">Unusual Spending Pattern</p>
+                            <p class="notification-message">Entertainment spending is 40% higher than usual</p>
+                            <span class="notification-time">2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search transactions...">
+        </div>
+        <div class="mobile-nav">
+            <a href="/dashboard" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/add" class="mobile-nav-item">
+                <i class="fas fa-plus"></i>
+                <span>Add Transaction</span>
+            </a>
+            <a href="/reports" class="mobile-nav-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/settings" class="mobile-nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+</nav>

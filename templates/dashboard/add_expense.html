@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Transaction</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/add-transaction.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- Interactive Navbar -->
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-wrapper">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item active" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="add-transaction-container">
+                <!-- Header with 3D Illustration -->
+                <div class="add-transaction-header">
+                    <div class="header-illustration">💼</div>
+                    <div class="header-content">
+                        <h2>Add New Transaction</h2>
+                    </div>
+                </div>
+
+                <!-- Success/Error Message -->
+                {% if message %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </div>
+                {% endif %}
+
+                {% if error %}
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
+                {% endif %}
+
+                <!-- Form -->
+                <form method="POST" class="add-transaction-form">
+                    <!-- Amount & Date Row -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount">AMOUNT</label>
+                            <div class="input-wrapper">
+                                <span class="currency-symbol">₹</span>
+                                <input type="number" id="amount" name="amount" placeholder="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">DATE</label>
+                            <input type="date" id="date" name="date" value="{{ today }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="form-group">
+                        <label>CATEGORY</label>
+                        <!-- Styled Dropdown Select Bar -->
+                        <div class="category-select-wrapper">
+                            <select id="category" name="category" class="category-select" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="Housing">🏠 Housing</option>
+                                <option value="Food">🍽️ Food</option>
+                                <option value="Transport">🚗 Transport</option>
+                                <option value="Entertainment">🎬 Entertainment</option>
+                                <option value="Health">❤️ Health</option>
+                                <option value="Shopping">🛍️ Shopping</option>
+                                <option value="Bills">📄 Bills</option>
+                                <option value="Other">➕ Other</option>
+                            </select>
+                        </div>
+                        <!-- Category Icons -->
+                        <div class="category-icons">
+                            <div class="category-icon" data-category="Housing" title="Housing">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="category-icon" data-category="Food" title="Food">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="category-icon" data-category="Transport" title="Transport">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="category-icon" data-category="Entertainment" title="Entertainment">
+                                <i class="fas fa-film"></i>
+                            </div>
+                            <div class="category-icon" data-category="Health" title="Health">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="category-icon" data-category="Shopping" title="Shopping">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="category-icon" data-category="Other" title="Other">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                        </div>
+
+                        <!-- Custom Category Input (Hidden by default) -->
+                        <div id="customCategoryBox" class="custom-category-box" style="display: none;">
+                            <label for="customCategory">CUSTOM CATEGORY NAME</label>
+                            <input type="text" id="customCategory" name="custom_category" placeholder="Enter your category name...">
+                        </div>
+                    </div>
+
+                    <!-- Type Selection -->
+                    <div class="form-group">
+                        <label>TYPE</label>
+                        <div class="type-buttons">
+                            <input type="radio" id="expense" name="type" value="Expense" checked required>
+                            <label for="expense" class="type-button type-expense">
+                                <i class="fas fa-arrow-up"></i> EXPENSE
+                            </label>
+
+                            <input type="radio" id="income" name="type" value="Income" required>
+                            <label for="income" class="type-button type-income">
+                                <i class="fas fa-arrow-down"></i> INCOME
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">DESCRIPTION</label>
+                        <textarea id="description" name="description" placeholder="Enter your description..." class="description-input"></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> ADD TRANSACTION
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='/dashboard'">
+                            <i class="fas fa-times"></i> CANCEL
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+
+    // Category icon selection
+    const categoryIcons = document.querySelectorAll('.category-icon');
+    const categorySelect = document.getElementById('category');
+    const customCategoryBox = document.getElementById('customCategoryBox');
+    const customCategoryInput = document.getElementById('customCategory');
+
+    categoryIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            categorySelect.value = category;
+
+            // Update active state
+            categoryIcons.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            // Show custom category box if "Other" is selected
+            if (category === 'Other') {
+                customCategoryBox.style.display = 'block';
+                customCategoryInput.focus();
+            } else {
+                customCategoryBox.style.display = 'none';
+                customCategoryInput.value = '';
+            }
+        });
+    });
+
+    // Update icon when select changes
+    categorySelect.addEventListener('change', function() {
+        const category = this.value;
+        categoryIcons.forEach(icon => {
+            if (icon.getAttribute('data-category') === category) {
+                icon.classList.add('active');
+            } else {
+                icon.classList.remove('active');
+            }
+        });
+
+        // Show custom category box if "Other" is selected
+        if (category === 'Other') {
+            customCategoryBox.style.display = 'block';
+            customCategoryInput.focus();
+        } else {
+            customCategoryBox.style.display = 'none';
+            customCategoryInput.value = '';
+        }
+    });
+
+    // Update category value when custom category is entered
+    customCategoryInput.addEventListener('input', function() {
+        if (this.value.trim()) {
+            categorySelect.value = this.value.trim();
+        }
+    });
+
+    // Form submission - use custom category if provided
+    document.querySelector('.add-transaction-form').addEventListener('submit', function(e) {
+        if (categorySelect.value === 'Other' && customCategoryInput.value.trim()) {
+            categorySelect.value = customCategoryInput.value.trim();
+        }
+    });
+});
+</script>
+<script src="/static/js/3d-interactive.js"></script>
+</body>
+</html>

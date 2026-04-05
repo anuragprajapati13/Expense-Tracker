@@ -1,0 +1,320 @@
+/* Budget Warning Notification Component */
+
+.budget-notification-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 450px;
+    pointer-events: none;
+}
+
+.budget-notification {
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3), 0 0 40px rgba(239, 68, 68, 0.2);
+    animation: slideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+               float 3s ease-in-out infinite 1.5s;
+    pointer-events: all;
+    border-left: 5px solid #ef4444;
+}
+
+/* Slide in animation from right */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Float animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Pulse animation for icon */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    }
+}
+
+/* Glow animation for icon */
+@keyframes glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px rgba(239, 68, 68, 1));
+    }
+}
+
+.notification-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.notification-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 28px;
+    flex-shrink: 0;
+    animation: pulse 2s infinite, glow 2s infinite;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.notification-title {
+    color: #ef4444;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+    flex: 1;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    color: #e0e7ff;
+    transform: rotate(90deg);
+}
+
+.notification-message {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.notification-subtext {
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    background: rgba(15, 23, 42, 0.5);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #f59e0b;
+}
+
+/* Progress Bar */
+.progress-section {
+    margin-bottom: 18px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(100, 116, 139, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Action Buttons */
+.notification-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-notification {
+    flex: 1;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-review {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.btn-review:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #ef4444;
+    color: #fecaca;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-budget {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+    border: none;
+}
+
+.btn-budget:hover {
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-notification:active {
+    transform: translateY(0);
+}
+
+/* Light Mode Overrides */
+body.light-theme .budget-notification {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(226, 232, 240, 0.6);
+    box-shadow: 0 20px 60px rgba(239, 68, 68, 0.2), 0 0 40px rgba(239, 68, 68, 0.1);
+}
+
+body.light-theme .notification-title {
+    color: #dc2626;
+}
+
+body.light-theme .notification-message {
+    color: #374151;
+}
+
+body.light-theme .notification-subtext {
+    color: #6b7280;
+    background: rgba(245, 245, 244, 0.8);
+    border-left-color: #f59e0b;
+}
+
+body.light-theme .notification-close {
+    color: #9ca3af;
+}
+
+body.light-theme .notification-close:hover {
+    color: #374151;
+}
+
+body.light-theme .progress-label {
+    color: #6b7280;
+}
+
+body.light-theme .progress-bar-container {
+    background: rgba(226, 232, 240, 0.6);
+    border-color: rgba(209, 213, 219, 0.5);
+}
+
+body.light-theme .btn-review {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+body.light-theme .btn-review:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+/* Slide out animation (when closing) */
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+}
+
+.budget-notification.closing {
+    animation: slideOutRight 0.4s ease-in forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .budget-notification-container {
+        top: 60px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .budget-notification {
+        padding: 20px;
+    }
+
+    .notification-actions {
+        flex-direction: column;
+    }
+
+    .btn-notification {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .notification-header {
+        gap: 12px;
+    }
+
+    .notification-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+
+    .notification-title {
+        font-size: 16px;
+    }
+
+    .notification-message {
+        font-size: 13px;
+    }
+}

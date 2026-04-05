@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/reports.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+</head>
+<body>
+<div class="main-container">
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item active" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/analytics" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="reports-container">
+                <div class="reports-header">
+                    <div class="header-content">
+                        <div>
+                            <h2>Reports <span style="font-size:1.2em;vertical-align:middle;">📊</span></h2>
+                            <p>Track your financial insights</p>
+                        </div>
+                        <div class="header-illustration">💼</div>
+                    </div>
+                    <button class="btn-filter" id="downloadPdfBtn" style="background: linear-gradient(135deg, #8B5CF6 0%, #a78bfa 100%); color: #fff;">
+                        <i class="fas fa-file-download"></i> Download PDF
+                    </button>
+                </div>
+
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <label>📅 Month</label>
+                        <select id="dateRange" class="filter-select">
+                            <option value="all" {% if reports_data.filters.month == 'all' %}selected{% endif %}>All Months</option>
+                            {% for month in reports_data.available_months %}
+                                <option value="{{ month.value }}" {% if reports_data.filters.month == month.value %}selected{% endif %}>{{ month.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>🏷️ Category</label>
+                        <select id="typeFilter" class="filter-select">
+                            {% for category in reports_data.available_categories %}
+                                <option value="{{ category.value }}" {% if reports_data.filters.category == category.value %}selected{% endif %}>{{ category.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button class="btn-filter" onclick="applyFilters()">
+                        <i class="fas fa-sliders-h"></i> Apply Filters
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">💰 Total Income</div>
+                        <div class="stat-value" id="totalIncomeValue">₹{{ reports_data.summary.income | int }}</div>
+                        <div class="stat-change income"><i class="fas fa-sync-alt"></i> Live updates enabled</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">💸 Total Expense</div>
+                        <div class="stat-value" id="totalExpenseValue">₹{{ reports_data.summary.expense | int }}</div>
+                        <div class="stat-change expense"><i class="fas fa-sync-alt"></i> Updates with filters</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">🎯 Net Savings</div>
+                        <div class="stat-value" id="netSavingsValue">₹{{ reports_data.summary.balance | int }}</div>
+                        <div class="stat-change savings"><i class="fas fa-sync-alt"></i> Recomputed in real time</div>
+                    </div>
+                </div>
+
+                <div class="charts-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <h3 style="margin: 0;">📈 Charts</h3>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: flex-end;">
+                            <select id="chartMonth" class="filter-select" style="min-width: 150px;">
+                                <option value="all">All Months</option>
+                                {% for month in reports_data.available_months %}
+                                    <option value="{{ month.value }}">{{ month.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <select id="chartCategory" class="filter-select" style="min-width: 150px;">
+                                {% for category in reports_data.available_categories %}
+                                    <option value="{{ category.value }}">{{ category.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Total Income</h3>
+                            <div id="incomeSummaryValue" style="font-size: 28px; color: #86efac; font-weight: 700; margin: 20px 0; font-family: 'Courier New', monospace;">₹{{ reports_data.summary.income | int }}</div>
+                            <div class="progress-bar-wrapper">
+                                <div id="incomeProgressBar" class="progress-bar safe" style="--bar-width: {{ reports_data.budget.percent if reports_data.budget.percent < 100 else 100 }}%;"></div>
+                            </div>
+                            <div id="incomeSummaryHint" style="font-size: 12px; color: #a78bfa; margin-top: 12px; display: flex; align-items: center; gap: 6px;"><i class="fas fa-sync-alt"></i> Auto-refreshing live report</div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3>Category-wise spending</h3>
+                            <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3>🔥 Expense trend</h3>
+                            <div class="chart-container"><canvas id="expenseTrendChart"></canvas></div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3>💹 Savings vs Expenses</h3>
+                            <div class="chart-container"><canvas id="savingsVsExpensesChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+                    <div class="budget-item">
+                        <h4>💳 Budget Comparison</h4>
+                        <div class="budget-info">
+                            <div>
+                                <div style="font-size: 12px; color: #a78bfa; margin-bottom: 4px;">Budget</div>
+                                <div id="budgetValue" class="budget-value">₹{{ reports_data.budget.value | int }}</div>
+                            </div>
+                            <div id="budgetPercent" class="budget-percentage">{{ reports_data.budget.percent }}%</div>
+                        </div>
+                        <div class="progress-bar-wrapper"><div id="budgetProgressBar" class="progress-bar {{ reports_data.budget.status }}" style="--bar-width: {{ reports_data.budget.percent }}%;"></div></div>
+
+                        <div class="budget-info" style="margin-top: 16px;">
+                            <div>
+                                <div style="font-size: 12px; color: #fca5a5; margin-bottom: 4px;">Actual</div>
+                                <div id="budgetActualValue" class="budget-value" style="color: #fca5a5;">₹{{ reports_data.summary.expense | int }}</div>
+                            </div>
+                            <div id="budgetActualPercent" class="budget-percentage" style="color: #fca5a5;">{{ reports_data.budget.percent }}%</div>
+                        </div>
+                        <div class="progress-bar-wrapper"><div id="budgetActualProgressBar" class="progress-bar {{ reports_data.budget.status }}" style="--bar-width: {{ reports_data.budget.percent }}%;"></div></div>
+
+                        <div id="budgetMessage" style="font-size: 12px; color: #fca5a5; margin-top: 12px;">{{ reports_data.budget.message }}</div>
+                    </div>
+
+                    <div class="insights-section" style="grid-column: auto; margin: 0; background: linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(59, 39, 98, 0.8) 100%); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 14px; padding: 24px; backdrop-filter: blur(20px);">
+                        <h3 style="font-size: 16px; color: #c4b5fd; margin: 0 0 20px 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">💡 Insights</h3>
+                        <div id="insightsList" style="display: flex; flex-direction: column; gap: 15px;">
+                            {% if reports_data.insights %}
+                                {% for insight in reports_data.insights %}
+                                    <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 12px; padding: 15px;">
+                                        <div style="font-size: 14px; color: #c4b5fd; font-weight: 600; margin-bottom: 4px;">{% if loop.first %}🔥 You spend most on {{ insight.name }}{% else %}📌 {{ insight.name }} is in your top spending{% endif %}</div>
+                                        <div style="font-size: 12px; color: #cbd5e1;">₹{{ insight.amount | int }} spent</div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 12px; padding: 15px; color: #cbd5e1;">Add transactions to see live insights.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transactions-section">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <h3 style="margin: 0;">👛 Latest Transactions</h3>
+                        <a href="#" style="color: #a78bfa; font-size: 14px; text-decoration: none; font-weight: 600;">View All →</a>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-wrapper" id="pdfTableWrapper">
+                            <table id="transactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Category</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if reports_data.transactions %}
+                                        {% for transaction in reports_data.transactions %}
+                                            <tr class="transaction-row">
+                                                <td class="date-cell">{{ transaction.date }}</td>
+                                                <td class="category-cell">{{ transaction.category }}</td>
+                                                <td class="desc-cell">{{ transaction.type }}</td>
+                                                <td class="amount-cell {% if transaction.type == 'Income' %}income{% else %}expense{% endif %}">{% if transaction.type == 'Income' %}+₹{{ transaction.amount | int }}{% else %}₹{{ transaction.amount | int }}{% endif %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr><td colspan="4" style="text-align: center; padding: 20px; color: #cbd5e1;">No transactions yet</td></tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="reports-data" type="application/json">{{ reports_data | tojson }}</script>
+<script src="/static/js/3d-interactive.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="/static/js/reports-live.js"></script>
+</body>
+</html>

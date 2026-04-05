@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Notification Demo</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/budget-notification.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/budget-notification.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 40px 20px;
+            background: #0f172a;
+        }
+        .demo-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .demo-header {
+            color: #e0e7ff;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .demo-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+        .demo-header p {
+            margin: 0;
+            color: #94a3b8;
+        }
+        .demo-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .demo-section h2 {
+            color: #cbd5e1;
+            margin-top: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .demo-btn {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        .demo-btn:active {
+            transform: translateY(0);
+        }
+        .demo-code {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            overflow-x: auto;
+            color: #cbd5e1;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .theme-toggle-demo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid #8B5CF6;
+            color: #c4b5fd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        body.light-theme .demo-container {
+            color: #1f2937;
+        }
+        body.light-theme .demo-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #e5e7eb;
+        }
+        body.light-theme .demo-section h2 {
+            color: #374151;
+        }
+        body.light-theme .demo-code {
+            background: #f3f4f6;
+            color: #374151;
+            border-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle-demo" onclick="toggleTheme()">🌙 Dark</button>
+
+<div class="demo-container">
+    <div class="demo-header">
+        <h1>💰 Budget Notification Demo</h1>
+        <p>Modern animated budget warning notification component for Expense Tracker</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>📌 Quick Demo</h2>
+        <p style="color: #cbd5e1; margin-bottom: 20px;">Click any button below to trigger the budget warning notification with different scenarios:</p>
+        
+        <div class="demo-buttons">
+            <button class="demo-btn" onclick="demoNotification1()">
+                🔴 Budget Exceeded (50%)
+            </button>
+            <button class="demo-btn" onclick="demoNotification2()">
+                🔴 Severely Over Budget
+            </button>
+            <button class="demo-btn" onclick="demoNotification3()">
+                🔴 Custom Message Demo
+            </button>
+            <button class="demo-btn" onclick="closeNotification()">
+                ✕ Close Notification
+            </button>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🔧 Usage Examples</h2>
+        
+        <h3 style="color: #a78bfa; margin-top: 0;">Basic Usage:</h3>
+        <div class="demo-code">
+budgetNotificationManager.show(
+    50000,  // Amount spent
+    40000,  // Budget limit
+    {
+        message: '⚠️ Budget Exceeded! You are spending too much',
+        suggestion: 'Try reducing food or shopping expenses',
+        autoHide: true,
+        autoHideDelay: 8000
+    }
+);
+        </div>
+
+        <h3 style="color: #a78bfa;">With Custom Callbacks:</h3>
+        <div class="demo-code">
+budgetNotificationManager.show(
+    75000,
+    50000,
+    {
+        message: '⚠️ Budget Exceeded!',
+        suggestion: 'You are 50% over budget',
+        onReviewClick: () => {
+            console.log('Review clicked');
+            window.location.href = '/reports';
+        },
+        onBudgetClick: () => {
+            console.log('Budget clicked');
+            // Open budget settings
+        }
+    }
+);
+        </div>
+
+        <h3 style="color: #a78bfa;">Quick Check & Show:</h3>
+        <div class="demo-code">
+// Only show if budget is exceeded
+budgetNotificationManager.checkAndShow(55000, 50000, {
+    message: '⚠️ Budget Exceeded!',
+    suggestion: 'Your expenses have exceeded the budget'
+});
+        </div>
+
+        <h3 style="color: #a78bfa;">Close Notification:</h3>
+        <div class="demo-code">
+budgetNotificationManager.close();
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>✨ Features</h2>
+        <ul style="color: #cbd5e1; line-height: 2;">
+            <li>✅ Smooth slide-in animation from top-right</li>
+            <li>✅ Pulsing glow effect on warning icon</li>
+            <li>✅ Floating animation for visual appeal</li>
+            <li>✅ Glassmorphism design with blur effects</li>
+            <li>✅ Responsive layout (works on mobile & desktop)</li>
+            <li>✅ Light & Dark theme support</li>
+            <li>✅ Progress bar showing % budget used</li>
+            <li>✅ Auto-hide after 8 seconds (configurable)</li>
+            <li>✅ Close button with smooth exit animation</li>
+            <li>✅ Custom callbacks for button actions</li>
+            <li>✅ Real-time budget calculations</li>
+        </ul>
+    </div>
+
+    <div class="demo-section">
+        <h2>🎨 Customization</h2>
+        <p style="color: #cbd5e1;">All notification text, timing, and actions are fully customizable. The component adapts to both light and dark themes automatically based on user preference.</p>
+    </div>
+</div>
+
+<script>
+function demoNotification1() {
+    budgetNotificationManager.show(60000, 50000, {
+        message: '⚠️ Budget Exceeded! You are spending too much this month',
+        suggestion: 'Try reducing food or shopping expenses. Set stricter budget limits.',
+        autoHide: true,
+        autoHideDelay: 10000
+    });
+}
+
+function demoNotification2() {
+    budgetNotificationManager.show(95000, 50000, {
+        message: '⚠️ Budget Exceeded! You are spending WAY too much',
+        suggestion: '⚡ URGENT: Your spending is 90% over budget! Take immediate action.',
+        autoHide: true,
+        autoHideDelay: 12000
+    });
+}
+
+function demoNotification3() {
+    budgetNotificationManager.show(55000, 50000, {
+        message: '⚠️ Budget Exceeded! Over spending alert',
+        suggestion: '💡 Consider reviewing your entertainment and dining out expenses.',
+        autoHide: false,
+        onReviewClick: () => alert('Redirecting to expenses...'),
+        onBudgetClick: () => alert('Opening budget settings...')
+    });
+}
+
+function closeNotification() {
+    budgetNotificationManager.close();
+}
+</script>
+
+</body>
+</html>

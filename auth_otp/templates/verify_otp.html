@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - ExpenseTracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="login-box">
+        <div class="auth-header">
+            <h1 class="auth-title">💰 ExpenseTracker</h1>
+            <p class="auth-subtitle">Verify OTP</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flashes">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+
+        <form method="POST" class="auth-form" id="otp-form">
+          <div class="form-group">
+            <label for="otp1">Enter OTP</label>
+            <div style="display: flex; gap: 12px; justify-content: center; margin-top: 10px;">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-input" id="otp1" required style="width: 48px; height: 48px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 1.5px solid #a5b4fc; background: #181a2a; color: #fff;">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-input" id="otp2" required style="width: 48px; height: 48px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 1.5px solid #a5b4fc; background: #181a2a; color: #fff;">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-input" id="otp3" required style="width: 48px; height: 48px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 1.5px solid #a5b4fc; background: #181a2a; color: #fff;">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-input" id="otp4" required style="width: 48px; height: 48px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 1.5px solid #a5b4fc; background: #181a2a; color: #fff;">
+            </div>
+            <input type="hidden" name="otp" id="otp-hidden">
+          </div>
+          <button type="submit" class="submit-btn">Verify OTP</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{{ url_for('otp.forgot_password') }}" class="back-link">Resend OTP</a>
+        </div>
+    </div>
+
+    <!-- Animated background elements -->
+    <div class="bg-element bg-element-1"></div>
+    <div class="bg-element bg-element-2"></div>
+    <div class="bg-element bg-element-3"></div>
+</div>
+
+<script src="/static/js/3d-interactive.js"></script>
+<script>
+// OTP input auto-focus and combine
+const otpInputs = Array.from(document.querySelectorAll('.otp-input'));
+otpInputs.forEach((input, idx) => {
+  input.addEventListener('input', function(e) {
+    if (this.value.length === 1 && idx < otpInputs.length - 1) {
+      otpInputs[idx + 1].focus();
+    }
+    updateHiddenOtp();
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !this.value && idx > 0) {
+      otpInputs[idx - 1].focus();
+    }
+  });
+});
+function updateHiddenOtp() {
+  document.getElementById('otp-hidden').value = otpInputs.map(i => i.value).join('');
+}
+document.getElementById('otp-form').addEventListener('submit', function(e) {
+  updateHiddenOtp();
+  // Optionally, prevent submit if not all filled
+  if (otpInputs.some(i => !i.value)) {
+    e.preventDefault();
+    otpInputs.find(i => !i.value).focus();
+  }
+});
+</script>
+</body>
+</html>

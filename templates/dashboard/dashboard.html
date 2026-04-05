@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard-new.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/budget-notification.css">
+    <link rel="stylesheet" href="/static/css/light-theme.css">
+    <link rel="stylesheet" href="/static/css/3d-enhanced.css">
+    <link rel="stylesheet" href="/static/css/navbar-interactive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/budget-notification.js"></script>
+    <script src="/static/js/navbar-interactive.js"></script>
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- Interactive Navbar -->
+    {% include 'components/navbar-interactive.html' %}
+
+    <div class="main-wrapper">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard" class="menu-item active" title="Dashboard"><i class="fas fa-home"></i></a></li>
+                <li><a href="/add" class="menu-item" title="Add Transaction"><i class="fas fa-plus"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Reports"><i class="fas fa-chart-pie"></i></a></li>
+                <li><a href="/calendar" class="menu-item" title="Calendar"><i class="fas fa-calendar"></i></a></li>
+                <li><a href="/reports" class="menu-item" title="Analytics"><i class="fas fa-chart-bar"></i></a></li>
+                <li><a href="/settings" class="menu-item" title="Budget Setting"><i class="fas fa-briefcase"></i></a></li>
+                <li><button class="menu-item logout sidebar-logout-btn" id="sidebarLogoutBtn" title="Logout" type="button" style="border: none; background: none; cursor: pointer; width: 100%; height: 100%; padding: 12px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-sign-out-alt"></i></button></li>
+            </ul>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+                        {# Overspending Warning Notification removed as requested #}
+            <!-- Header Section -->
+            <div class="dashboard-header">
+                <div class="header-content">
+                    <div>
+                        <h2>📊 Dashboard</h2>
+                        <p>Track your financial insights</p>
+                    </div>
+                    <div class="header-illustration">💼</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid - Update with dynamic data -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">💰 Total Balance</div>
+                    <div class="stat-value">₹{{ balance | default(0) | int }}</div>
+                    <div class="stat-change">+₹1,400 today</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">📈 Monthly Income</div>
+                    <div class="stat-value">₹{{ income | default(0) | int }}</div>
+                    <div class="stat-change">{{ percent_used | int }}% used</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">📊 Monthly Expenses</div>
+                    <div class="stat-value">₹{{ expense | default(0) | int }}</div>
+                    <div class="stat-change">↑ ₹2,400 this month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">🟢 Balance Left</div>
+                    <div class="stat-value">₹{{ budget_remaining | default(0) | int }}</div>
+                    <div class="stat-change">Remaining from monthly budget</div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Left Column: Expense Breakdown Pie Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Expense Breakdown</h3>
+                    </div>
+                    <div class="card-body chart-center">
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            {% for category, amount in category_data.items() %}
+                            <div class="legend-item">
+                                <span class="legend-color"></span>
+                                <span>{{ category }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Income vs Expense Chart & Recent Transactions -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Income vs Expense Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📈 Income - Expense</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="incomeExpenseChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>👛 Recent Transactions</h3>
+                            <a href="/reports" class="view-all">View All →</a>
+                        </div>
+                        <div class="card-body">
+                            <div style="overflow-x: auto;">
+                                <table class="transactions-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Category</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if expenses %}
+                                            {% for expense in expenses[:5] %}
+                                            <tr>
+                                                <td>{{ expense.date }}</td>
+                                                <td>{{ expense.category }}</td>
+                                                <td style="color: {% if expense.type == 'Income' %}#86efac{% else %}#fca5a5{% endif %}; font-weight: 700;">
+                                                    {% if expense.type == 'Income' %}+{% else %}{% endif %}₹{{ expense.amount | int }}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="3" style="text-align: center; color: #cbd5e1;">No transactions yet</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Upcoming Bills & Top Categories -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Upcoming Bills -->
+                    <div class="card">
+                        <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                            <h3 style="margin: 0;">📅 Upcoming Bills</h3>
+                            <a href="/add_bill" title="Add Bill" style="color: #a78bfa; font-size: 1.3em; display: flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 8px; transition: background 0.2s;">
+                                <i class="fas fa-plus-circle"></i>
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="bills-list">
+                                {% if bills %}
+                                    {% for bill in bills %}
+                                    <div class="bill-item" style="display: flex; align-items: center; gap: 18px;">
+                                        <span style="display: flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, #312e81 60%, #a78bfa 100%); box-shadow: 0 2px 12px #a78bfa22; border: 2px solid #a78bfa55;">
+                                            <i class="fas {{ bill.icon if bill.icon else 'fa-file-invoice' }}" style="font-size: 1.7em; color: #fff;"></i>
+                                        </span>
+                                        <div style="flex:1;">
+                                            <p style="font-weight: 600; font-size: 1.1em; color: #fff; margin-bottom: 2px;">{{ bill.name }}</p>
+                                            <small style="color: #cbd5e1;">{{ bill.due_date }}</small>
+                                        </div>
+                                        <span class="bill-amount" style="font-weight: 700; color: #a78bfa; font-size: 1.1em;">₹{{ bill.amount }}</span>
+                                        <span class="bill-status {{ bill.status|lower }}">{{ bill.status }}</span>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div style="color: #cbd5e1; text-align: center;">No upcoming bills</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Categories -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🏷️ Top Categories</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="categories-list">
+                                {% if sorted_categories %}
+                                    {% for category, amount in sorted_categories[:5] %}
+                                    <div class="category-row">
+                                        <span class="category-name">🍕 {{ category }}</span>
+                                        <span class="category-amount">₹{{ amount | int }}</span>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Pie Chart - Spending Breakdown
+const categoryData = {{ category_data | tojson | safe or '{}' }};
+const categoryLabels = Object.keys(categoryData);
+const categoryValues = Object.values(categoryData);
+
+const colors = ['#667eea', '#764ba2', '#f472b6', '#fbbf24', '#10b981', '#06b6d4', '#8b5cf6'];
+
+let pieChartInstance = null;
+const pieCtx = document.getElementById('pieChart');
+if (pieCtx && pieChartInstance) {
+    pieChartInstance.destroy();
+}
+
+if (pieCtx) {
+    pieChartInstance = new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryValues,
+                backgroundColor: colors.slice(0, categoryLabels.length),
+                borderColor: 'rgba(30, 41, 59, 0.6)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Update legend colors
+    const legendItems = document.querySelectorAll('.legend-color');
+    legendItems.forEach((item, index) => {
+        item.style.backgroundColor = colors[index % colors.length];
+    });
+}
+
+// Income vs Expense Bar Chart
+const incomeExpenseCtx = document.getElementById('incomeExpenseChart');
+let incomeExpenseInstance = null;
+
+const monthlyIncome = {{ monthly_income | tojson | safe or '{}' }};
+const monthlyExpense = {{ monthly_expense | tojson | safe or '{}' }};
+const months = Object.keys(monthlyIncome).length > 0 ? Object.keys(monthlyIncome) : Object.keys(monthlyExpense);
+const incomeData = months.map(m => monthlyIncome[m] || 0);
+const expenseData = months.map(m => monthlyExpense[m] || 0);
+
+if (incomeExpenseCtx) {
+    incomeExpenseInstance = new Chart(incomeExpenseCtx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: incomeData,
+                    backgroundColor: '#667eea',
+                    borderRadius: 8,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Expense',
+                    data: expenseData,
+                    backgroundColor: '#f472b6',
+                    borderRadius: 8,
+                    borderSkipped: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#cbd5e1',
+                        font: { size: 12, weight: 'bold' },
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#e0e7ff',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(139, 92, 246, 0.5)',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + context.parsed.y + 'K';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#94a3b8' },
+                    grid: { color: 'rgba(100, 116, 139, 0.2)' },
+                    max: 25
+                },
+                x: {
+                    ticks: { color: '#94a3b8' },
+                    grid: { color: 'rgba(100, 116, 139, 0.2)' }
+                }
+            }
+        }
+    });
+}
+
+// Budget notification
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const budgetData = window.budgetData || {};
+        if (budgetData.budget > 0 && budgetData.total_expense > budgetData.budget) {
+            budgetNotificationManager.show(
+                budgetData.total_expense,
+                budgetData.budget,
+                {
+                    message: '⚠️ Budget Exceeded! You are spending too much this month',
+                    suggestion: 'Review your spending and consider setting monthly limits.',
+                    autoHide: false
+                }
+            );
+        }
+    }, 1000);
+});
+</script>
+
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/3d-interactive.js"></script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+/* ========== 3D ANIMATED FRAMEWORK - REALISTIC EFFECTS ========== */
+
+/* ========== 3D PERSPECTIVE & TRANSFORM SETUP ========== */
+
+html {
+    perspective: 1500px;
+}
+
+body {
+    perspective: 1500px;
+    transform-style: preserve-3d;
+}
+
+.main-container {
+    perspective: 1500px;
+    transform-style: preserve-3d;
+}
+
+.main-wrapper {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.content {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+/* ========== 3D FLOATING ANIMATIONS ========== */
+
+@keyframes float3D {
+    0%, 100% {
+        transform: translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: translateY(-8px) translateZ(15px) rotateX(2deg) rotateY(-3deg);
+    }
+    50% {
+        transform: translateY(-12px) translateZ(20px) rotateX(4deg) rotateY(0deg);
+    }
+    75% {
+        transform: translateY(-8px) translateZ(15px) rotateX(2deg) rotateY(3deg);
+    }
+}
+
+@keyframes float3DSmooth {
+    0%, 100% {
+        transform: translateY(0px) translateZ(0px);
+    }
+    50% {
+        transform: translateY(-6px) translateZ(12px);
+    }
+}
+
+@keyframes float3DDeep {
+    0%, 100% {
+        transform: translateY(0px) translateZ(0px) rotateX(0deg);
+    }
+    50% {
+        transform: translateY(-10px) translateZ(25px) rotateX(3deg);
+    }
+}
+
+/* ========== 3D ROTATION ANIMATIONS ========== */
+
+@keyframes rotate3D {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    25% {
+        transform: rotateX(5deg) rotateY(5deg) rotateZ(2deg);
+    }
+    50% {
+        transform: rotateX(0deg) rotateY(10deg) rotateZ(0deg);
+    }
+    75% {
+        transform: rotateX(-5deg) rotateY(5deg) rotateZ(-2deg);
+    }
+    100% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+}
+
+@keyframes tiltIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) rotateX(-15deg) rotateZ(-10deg) translateZ(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg) rotateZ(0deg) translateZ(0px);
+    }
+}
+
+@keyframes tiltUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) rotateX(-20deg) translateZ(-80px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg) translateZ(0px);
+    }
+}
+
+/* ========== 3D GLOW ANIMATIONS ========== */
+
+@keyframes glow3D {
+    0%, 100% {
+        box-shadow: 
+            0 0 20px rgba(139, 92, 246, 0.3),
+            0 0 40px rgba(139, 92, 246, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(139, 92, 246, 0.6),
+            0 0 60px rgba(139, 92, 246, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+    }
+}
+
+@keyframes glow3DCyan {
+    0%, 100% {
+        box-shadow: 
+            0 0 20px rgba(6, 182, 212, 0.3),
+            0 0 40px rgba(6, 182, 212, 0.1);
+    }
+    50% {
+        box-shadow: 
+            0 0 30px rgba(6, 182, 212, 0.6),
+            0 0 60px rgba(6, 182, 212, 0.3);
+    }
+}
+
+@keyframes glow3DPulse {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px rgba(139, 92, 246, 0.4),
+            0 0 20px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+        text-shadow: 
+            0 0 20px rgba(139, 92, 246, 0.8),
+            0 0 40px rgba(139, 92, 246, 0.4),
+            0 0 60px rgba(139, 92, 246, 0.2);
+    }
+}
+
+/* ========== 3D SCALE & DEPTH ANIMATIONS ========== */
+
+@keyframes scaleDepth {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateZ(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateZ(0px);
+    }
+}
+
+@keyframes scaleDepthPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.6) translateZ(-150px) rotateX(-20deg);
+    }
+    50% {
+        transform: scale(1.05) translateZ(10px) rotateX(0deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateZ(0px) rotateX(0deg);
+    }
+}
+
+/* ========== 3D PERSPECTIVE ANIMATIONS ========== */
+
+@keyframes perspectiveIn {
+    0% {
+        opacity: 0;
+        transform: perspective(1000px) rotateX(90deg) rotateY(0deg) translateZ(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px);
+    }
+}
+
+@keyframes perspectiveRotate {
+    0% {
+        transform: perspective(1200px) rotateY(-90deg) translateZ(0);
+    }
+    100% {
+        transform: perspective(1200px) rotateY(0deg) translateZ(0);
+    }
+}
+
+/* ========== HOVER 3D LIFT EFFECT ========== */
+
+@keyframes lift3D {
+    0% {
+        transform: translateZ(0px) translateY(0px);
+    }
+    100% {
+        transform: translateZ(20px) translateY(-5px);
+    }
+}
+
+@keyframes liftDeep {
+    0% {
+        transform: translateZ(0px) translateY(0px);
+    }
+    100% {
+        transform: translateZ(30px) translateY(-8px);
+    }
+}
+
+/* ========== DEPTH SHADOW SYSTEM ========== */
+
+.depth-shadow-1 {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.depth-shadow-2 {
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.depth-shadow-3 {
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        0 15px 35px rgba(0, 0, 0, 0.15),
+        0 25px 60px rgba(0, 0, 0, 0.1);
+}
+
+.depth-shadow-deep {
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 40px 100px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.depth-shadow-glow {
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.depth-shadow-cyan {
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(6, 182, 212, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ========== 3D CARD EFFECTS ========== */
+
+.card-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-3d:hover {
+    transform: translateZ(15px) translateY(-5px) rotateX(3deg) rotateY(-2deg);
+}
+
+.card-3d-deep {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-3d-deep:hover {
+    transform: translateZ(25px) translateY(-8px) rotateX(4deg) rotateY(-3deg);
+}
+
+/* ========== 3D FORM ELEMENTS ========== */
+
+.input-3d {
+    transform-style: preserve-3d;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.input-3d:focus {
+    transform: translateZ(8px) scale(1.01);
+}
+
+.button-3d {
+    transform-style: preserve-3d;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.button-3d:hover {
+    transform: translateZ(12px) translateY(-3px);
+}
+
+.button-3d:active {
+    transform: translateZ(5px) translateY(-1px);
+}
+
+/* ========== GLASSMORPHISM 3D ========== */
+
+.glass-3d {
+    background: rgba(10, 10, 20, 0.7);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 20px;
+    transform-style: preserve-3d;
+}
+
+.glass-3d-light {
+    background: rgba(139, 92, 246, 0.08);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: 20px;
+    transform-style: preserve-3d;
+}
+
+/* ========== GRADIENT WITH DEPTH ========== */
+
+.gradient-3d-primary {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+}
+
+.gradient-3d-neon {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
+}
+
+.gradient-3d-glow {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(139, 92, 246, 0.08));
+}
+
+/* ========== 3D TEXT EFFECTS ========== */
+
+.text-3d-glow {
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 4px 12px rgba(139, 92, 246, 0.4),
+        0 8px 24px rgba(139, 92, 246, 0.2);
+    letter-spacing: 0.5px;
+}
+
+.text-3d-cyan {
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 4px 12px rgba(6, 182, 212, 0.4),
+        0 8px 24px rgba(6, 182, 212, 0.2);
+}
+
+.text-3d-deep {
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 6px 16px rgba(139, 92, 246, 0.3);
+}
+
+/* ========== STAGGERED ANIMATION SYSTEM ========== */
+
+.animation-stagger-1 {
+    animation-delay: 0.1s;
+}
+
+.animation-stagger-2 {
+    animation-delay: 0.2s;
+}
+
+.animation-stagger-3 {
+    animation-delay: 0.3s;
+}
+
+.animation-stagger-4 {
+    animation-delay: 0.4s;
+}
+
+.animation-stagger-5 {
+    animation-delay: 0.5s;
+}
+
+/* ========== INTERACTIVE 3D TRANSFORM STATES ========== */
+
+.interactive-3d {
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.interactive-3d:hover {
+    transform: translateZ(15px) rotateX(2deg) rotateY(-3deg);
+}
+
+.interactive-3d:active {
+    transform: translateZ(5px) rotateX(1deg) rotateY(-1deg);
+}
+
+/* ========== LIGHT MODE 3D ADJUSTMENTS ========== */
+
+body.light-theme .depth-shadow-glow {
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(139, 92, 246, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 3px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .text-3d-glow {
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(139, 92, 246, 0.3),
+        0 8px 24px rgba(139, 92, 246, 0.15);
+}
+
+/* ========== ANIMATION TIMING PRESETS ========== */
+
+.slow-animation {
+    animation-duration: 2s !important;
+}
+
+.normal-animation {
+    animation-duration: 1.2s !important;
+}
+
+.fast-animation {
+    animation-duration: 0.6s !important;
+}
+
+/* ========== MEDIA QUERIES FOR PERFORMANCE ========== */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Reduce 3D effects on mobile for better performance */
+@media (max-width: 768px) {
+    .card-3d:hover,
+    .card-3d-deep:hover {
+        transform: translateY(-3px);
+    }
+    
+    .button-3d:hover {
+        transform: translateY(-2px);
+    }
+    
+    .input-3d:focus {
+        transform: scale(1);
+    }
+}
