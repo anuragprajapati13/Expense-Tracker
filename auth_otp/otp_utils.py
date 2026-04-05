@@ -2,8 +2,13 @@ import smtplib
 import random
 import socket
 import threading
+import logging
 from datetime import datetime, timedelta
 from flask import session
+
+# Setup logging for email sending
+logging.basicConfig(level=logging.DEBUG)
+email_logger = logging.getLogger("OTP_EMAIL")
 
 # 🔹 Generate OTP
 def generate_otp():
@@ -53,36 +58,49 @@ def clear_otp():
 def _send_email_background(receiver_email, otp, sender_email, app_password):
     """Background task to send OTP email without blocking request."""
     try:
-        print(f"[DEBUG] Sending OTP to {receiver_email} from {sender_email}")
+        email_logger.info(f"[BACKGROUND] Starting email send for {receiver_email}")
+        print(f"[EMAIL_SEND] Starting OTP email for {receiver_email}")
         
         # Create socket with 10-second timeout
         socket_timeout = 10
         
         # Connect to Gmail SMTP server with timeout
+        email_logger.debug(f"Connecting to Gmail SMTP server...")
+        print(f"[EMAIL_SEND] Connecting to Gmail SMTP...")
         server = smtplib.SMTP("smtp.gmail.com", 587, timeout=socket_timeout)
         server.starttls()
         
         # Login with sender email and app password
-        print(f"[DEBUG] Logging in to Gmail...")
+        email_logger.debug(f"Logging in with {sender_email}")
+        print(f"[EMAIL_SEND] Logging in to Gmail...")
         server.login(sender_email, app_password)
 
         # Construct the email message
         message = f"""Subject: Your ExpenseTracker OTP\n\nHello,\n\nYour One-Time Password (OTP) for password reset is:\n\n    {otp}\n\nThis OTP is valid for 5 minutes. If you did not request this, please ignore this email.\n\nRegards,\nExpenseTracker Team"""
         
         # Send the email
-        print(f"[DEBUG] Sending email...")
+        email_logger.debug(f"Sending email message...")
+        print(f"[EMAIL_SEND] Sending email...")
         server.sendmail(sender_email, receiver_email, message)
         server.quit()
         
-        print(f"[DEBUG] OTP email sent successfully to {receiver_email}")
+        email_logger.info(f"✅ SUCCESS: OTP email sent to {receiver_email}")
+        print(f"[EMAIL_SEND] ✅ OTP email sent successfully to {receiver_email}")
+        
     except smtplib.SMTPAuthenticationError as e:
-        print(f"EMAIL ERROR - Authentication Failed: Check your email/password. Error: {e}")
+        email_logger.error(f"❌ AUTHENTICATION FAILED: {str(e)}")
+        print(f"❌ [EMAIL_ERROR] AUTHENTICATION FAILED - Email: {sender_email}")
+        print(f"   Make sure EXPENSE_TRACKER_EMAIL_PASS is a Gmail App Password (not your regular password)")
+        print(f"   Error: {e}")
     except socket.timeout:
-        print(f"EMAIL ERROR - Socket Timeout: Gmail server took too long to respond")
+        email_logger.error(f"❌ SOCKET TIMEOUT: Gmail server took too long")
+        print(f"❌ [EMAIL_ERROR] SOCKET TIMEOUT - Gmail server not responding")
     except smtplib.SMTPException as e:
-        print(f"EMAIL ERROR - SMTP Error: {e}")
+        email_logger.error(f"❌ SMTP ERROR: {str(e)}")
+        print(f"❌ [EMAIL_ERROR] SMTP Error: {e}")
     except Exception as e:
-        print(f"EMAIL ERROR - Unexpected Error: {e}")
+        email_logger.error(f"❌ UNEXPECTED ERROR: {str(e)}")
+        print(f"❌ [EMAIL_ERROR] Unexpected Error: {e}")
         import traceback
         traceback.print_exc()
 
@@ -95,12 +113,16 @@ def send_otp_email(receiver_email, otp):
 
         # Validate that both credentials are set
         if not sender_email or not app_password:
-            error_msg = "ERROR: Email credentials not configured. Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in .env"
+            error_msg = "❌ ERROR: Email credentials not configured in Render environment"
+            email_logger.error(error_msg)
             print(error_msg)
+            print("   Set EXPENSE_TRACKER_EMAIL and EXPENSE_TRACKER_EMAIL_PASS in Render dashboard")
             return False
 
         # Remove spaces from app password (in case they were accidentally added)
         app_password = app_password.replace(" ", "")
+        
+        email_logger.info(f"Starting OTP email send for {receiver_email}")
 
         # Send email in background thread to avoid request timeout
         # This returns immediately to the user, then sends email asynchronously
@@ -111,11 +133,13 @@ def send_otp_email(receiver_email, otp):
         )
         email_thread.start()
         
-        print(f"[DEBUG] Email sending started in background for {receiver_email}")
+        email_logger.info(f"Email thread started for {receiver_email}")
+        print(f"[EMAIL_SEND] Background thread started for {receiver_email}")
         return True
         
     except Exception as e:
-        print(f"ERROR - Failed to start email thread: {e}")
+        email_logger.error(f"Failed to start email thread: {str(e)}")
+        print(f"❌ ERROR - Failed to start email thread: {e}")
         import traceback
         traceback.print_exc()
         return False
