@@ -25,6 +25,7 @@ body {
     border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     z-index: 1000;
     padding: 1rem 0;
+    margin: 0;
 }
 
 .navbar-container {
@@ -92,7 +93,7 @@ body {
 }
 
 /* ========== HERO SECTION ========== */
-.hero {
+.hero {4
     margin-top: 60px;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -599,7 +600,7 @@ body {
         grid-template-columns: 1fr;
         gap: 2rem;
         padding: 2rem 1rem;
-        margin-top: 50px;
+        margin-top: 30px;
     }
 
     .hero-title {
