@@ -10,7 +10,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     color: #e2e8f0;
-    overflow-x: hidden;
+    overflow: visible;
     min-height: 100vh;
 }
 
@@ -93,7 +93,7 @@ body {
 }
 
 /* ========== HERO SECTION ========== */
-.hero {4
+.hero {
     margin-top: 120px;
     display: grid;
     grid-template-columns: 1fr 1fr;
