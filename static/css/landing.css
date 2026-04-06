@@ -29,15 +29,16 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    border-bottom: none;
     z-index: 1000;
     padding: 0;
     margin: 0;
     display: flex;
     align-items: center;
     height: auto;
+    width: 100%;
 }
 
 .navbar-container {
@@ -107,12 +108,13 @@ body {
 
 /* ========== HERO SECTION ========== */
 .hero {
-    margin-top: 80px;
+    margin-top: 0;
+    padding-top: calc(4rem + 60px);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
     align-items: center;
-    padding: 4rem 2rem;
+    padding-bottom: 4rem;
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -616,8 +618,11 @@ body {
     .hero {
         grid-template-columns: 1fr;
         gap: 2rem;
-        padding: 2rem 1rem;
-        margin-top: 70px;
+        padding-top: calc(2rem + 50px);
+        padding-bottom: 2rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin-top: 0;
     }
 
     .hero-title {
