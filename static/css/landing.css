@@ -94,7 +94,7 @@ body {
 
 /* ========== HERO SECTION ========== */
 .hero {4
-    margin-top: 60px;
+    margin-top: 80px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
@@ -600,7 +600,7 @@ body {
         grid-template-columns: 1fr;
         gap: 2rem;
         padding: 2rem 1rem;
-        margin-top: 30px;
+        margin-top: 60px;
     }
 
     .hero-title {
