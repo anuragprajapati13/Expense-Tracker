@@ -87,11 +87,6 @@ except Exception as e:
         print(f"❌ CRITICAL: MongoDB connection error: {error_msg}")
         raise
 
-# Register OTP blueprint after app and mongo are defined
-from auth_otp.routes import otp_blueprint, set_mongo
-set_mongo(mongo)
-app.register_blueprint(otp_blueprint)
-
 # ---------------- CONTEXT PROCESSOR FOR NOTIFICATIONS BADGE ----------------
 @app.context_processor
 def inject_unread_notifications():
@@ -170,13 +165,22 @@ def analytics():
 
 # ---------------- END MONGODB CONFIG ----------------
 
-# ---------------- LOGIN ----------------
-@app.route("/", methods=["GET", "POST"])
-def login():
+# =============== LANDING PAGE ===============
+@app.route("/landing")
+def landing():
+    """Serve landing page"""
+    return render_template("landing.html")
+
+# =============== LOGIN PAGE ===============
+@app.route("/login", methods=["GET", "POST"])
+def login_page():
+    """Dedicated login page"""
+    # If user is already logged in, redirect to dashboard
+    if "user_id" in session:
+        return redirect("/dashboard")
+    
     error = None
     
-
-
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "").strip()
@@ -201,8 +205,54 @@ def login():
                     error = "Invalid email or password. Please try again or register."
             else:
                 error = "Invalid email or password. Please try again or register."
-
+    
     return render_template("auth/login.html", error=error)
+
+# =============== HOME - ROUTER ===============
+@app.route("/", methods=["GET", "POST"])
+def home():
+    """
+    Route "/" serves as a router:
+    - If user is logged in: redirect to dashboard
+    - If user is not logged in: show landing page
+    - On POST (login form): handle login
+    """
+    
+    # If user is already logged in, send them to dashboard
+    if "user_id" in session:
+        return redirect("/dashboard")
+    
+    # If this is a POST request, handle login
+    if request.method == "POST":
+        error = None
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+
+        if not email or not password:
+            error = "Email and password are required!"
+        else:
+            user = mongo.db.users.find_one({"email": email})
+            if user:
+                stored_pw = user.get("password", "")
+                import bcrypt
+                # Convert stored password string to bytes for bcrypt
+                if isinstance(stored_pw, str):
+                    stored_pw_bytes = stored_pw.encode('utf-8')
+                else:
+                    stored_pw_bytes = bytes(stored_pw)
+                if bcrypt.checkpw(password.encode('utf-8'), stored_pw_bytes):
+                    session["user_id"] = str(user["_id"])
+                    session["user_name"] = user["name"]
+                    return redirect("/dashboard")
+                else:
+                    error = "Invalid email or password. Please try again or register."
+            else:
+                error = "Invalid email or password. Please try again or register."
+        
+        return render_template("auth/login.html", error=error)
+    
+    # If GET request and not logged in, show landing page
+    return render_template("landing.html")
 
 
 # ---------------- REGISTER ----------------

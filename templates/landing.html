@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseTracker - Take Control of Your Finances</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/3d-enhanced.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="logo">
+            <i class="fas fa-coins"></i>
+            <span>ExpenseTracker</span>
+        </div>
+        <div class="nav-buttons">
+            <a href="/login" class="nav-btn signin-btn">Sign In</a>
+            <a href="/register" class="nav-btn signup-btn">Sign Up</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="floating-coin coin-1"><i class="fas fa-coins"></i></div>
+    <div class="floating-coin coin-2"><i class="fas fa-coins"></i></div>
+    <div class="floating-coin coin-3"><i class="fas fa-piggy-bank"></i></div>
+    <div class="floating-coin coin-4"><i class="fas fa-chart-line"></i></div>
+    
+    <div class="hero-content">
+        <h1 class="hero-title animation-fade-in">
+            Take Control of Your Finances
+        </h1>
+        <p class="hero-subtitle animation-fade-in-delay">
+            Track expenses, manage budgets, and achieve your financial goals with ExpenseTracker
+        </p>
+        
+        <div class="hero-buttons animation-fade-in-delay-2">
+            <a href="/register" class="btn btn-primary">
+                <span>Get Started Free</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="/login" class="btn btn-secondary">
+                <span>Already have an account?</span>
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="hero-image">
+        <div class="dashboard-preview card-3d depth-shadow-glow">
+            <div class="preview-header">
+                <div class="preview-dot"></div>
+                <div class="preview-dot"></div>
+                <div class="preview-dot"></div>
+            </div>
+            <div class="preview-content">
+                <div class="preview-chart">
+                    <div class="chart-bar bar-1"></div>
+                    <div class="chart-bar bar-2"></div>
+                    <div class="chart-bar bar-3"></div>
+                    <div class="chart-bar bar-4"></div>
+                </div>
+                <div class="preview-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Balance</span>
+                        <span class="stat-value">$5,234.50</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Expenses</span>
+                        <span class="stat-value">$1,285.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <h2 class="section-title">Why Choose ExpenseTracker?</h2>
+    
+    <div class="features-grid">
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <h3>Smart Analytics</h3>
+            <p>Get detailed insights into your spending habits with beautiful charts and statistics</p>
+        </div>
+        
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h3>Budget Management</h3>
+            <p>Set and track budgets across different categories to stay within your financial goals</p>
+        </div>
+        
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Payment Tracking</h3>
+            <p>Keep track of bills and recurring payments with reminders so you never miss a due date</p>
+        </div>
+        
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Responsive Design</h3>
+            <p>Access your finances from any device with our fully responsive web application</p>
+        </div>
+        
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>Your financial data is protected with industry-standard encryption and privacy measures</p>
+        </div>
+        
+        <div class="feature-card card-3d depth-shadow-glow">
+            <div class="feature-icon">
+                <i class="fas fa-lightning-bolt"></i>
+            </div>
+            <h3>Fast & Easy</h3>
+            <p>Intuitive interface makes tracking expenses as simple as a few clicks</p>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+    <div class="stats-container">
+        <div class="stat-box">
+            <h3>10K+</h3>
+            <p>Active Users</p>
+        </div>
+        <div class="stat-box">
+            <h3>$500M+</h3>
+            <p>Tracked</p>
+        </div>
+        <div class="stat-box">
+            <h3>99.9%</h3>
+            <p>Uptime</p>
+        </div>
+        <div class="stat-box">
+            <h3>24/7</h3>
+            <p>Support</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta">
+    <div class="cta-content">
+        <h2>Ready to Take Control of Your Money?</h2>
+        <p>Join thousands of users who are already managing their finances smarter</p>
+        <div class="cta-buttons">
+            <a href="/register" class="btn btn-primary btn-large">
+                <span>Start Your Free Account</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="/login" class="btn btn-outline btn-large">
+                <span>Sign In</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>ExpenseTracker</h4>
+            <p>Your personal finance companion</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/login">Sign In</a></li>
+                <li><a href="/register">Sign Up</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Privacy</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Follow Us</h4>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 ExpenseTracker. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Animated background elements -->
+<div class="bg-element bg-element-1"></div>
+<div class="bg-element bg-element-2"></div>
+<div class="bg-element bg-element-3"></div>
+
+<script src="{{ url_for('static', filename='js/3d-interactive.js') }}"></script>
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>
