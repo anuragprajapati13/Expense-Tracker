@@ -136,8 +136,14 @@ def send_otp_email(receiver_email, otp):
     import os
     try:
         # Get Mailgun credentials from environment
+        # Try both MAILGUN_DOMAIN and MAILGUN_API_KEY (our naming)
+        # Also try API_KEY for compatibility with Mailgun examples
         mailgun_domain = os.environ.get("MAILGUN_DOMAIN", "").strip()
         mailgun_api_key = os.environ.get("MAILGUN_API_KEY", "").strip()
+        
+        # Fallback to API_KEY if MAILGUN_API_KEY not found
+        if not mailgun_api_key:
+            mailgun_api_key = os.environ.get("API_KEY", "").strip()
 
         # Validate that credentials are set
         if not mailgun_domain or not mailgun_api_key:
