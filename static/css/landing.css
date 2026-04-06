@@ -1,5 +1,11 @@
 /* ========== LANDING PAGE STYLES ========== */
 
+html {
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -10,8 +16,11 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     color: #e2e8f0;
-    overflow: visible;
+    overflow-y: auto;
+    overflow-x: hidden;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 /* ========== NAVBAR ========== */
@@ -94,7 +103,7 @@ body {
 
 /* ========== HERO SECTION ========== */
 .hero {
-    margin-top: 120px;
+    margin-top: 80px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
@@ -192,6 +201,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 40px;
+    padding-bottom: 40px;
 }
 
 .dashboard-preview {
@@ -202,6 +213,8 @@ body {
     min-height: 400px;
     width: 100%;
     animation: float 3s ease-in-out infinite;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 @keyframes float {
@@ -600,7 +613,7 @@ body {
         grid-template-columns: 1fr;
         gap: 2rem;
         padding: 2rem 1rem;
-        margin-top: 100px;
+        margin-top: 70px;
     }
 
     .hero-title {
