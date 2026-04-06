@@ -188,6 +188,9 @@ body {
     position: relative;
     perspective: 1000px;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dashboard-preview {
@@ -195,7 +198,8 @@ body {
     border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: 16px;
     padding: 0;
-    min-height: 300px;
+    min-height: 400px;
+    width: 100%;
     animation: float 3s ease-in-out infinite;
 }
 
@@ -219,28 +223,39 @@ body {
 }
 
 .preview-content {
-    padding: 2rem;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
 }
 
 .preview-chart {
     display: flex;
     align-items: flex-end;
-    gap: 1rem;
+    gap: 1.2rem;
     margin-bottom: 2rem;
-    height: 120px;
+    height: 180px;
 }
 
 .chart-bar {
     flex: 1;
     background: linear-gradient(180deg, #a5b4fc, #7c3aed);
-    border-radius: 8px 8px 0 0;
-    opacity: 0.8;
+    border-radius: 12px 12px 0 0;
+    opacity: 0.9;
+    box-shadow: 0 4px 15px rgba(165, 180, 252, 0.3);
+    transition: all 0.3s ease;
 }
 
-.chart-bar:nth-child(1) { height: 40%; }
-.chart-bar:nth-child(2) { height: 70%; }
-.chart-bar:nth-child(3) { height: 55%; }
-.chart-bar:nth-child(4) { height: 80%; }
+.chart-bar:hover {
+    opacity: 1;
+    box-shadow: 0 8px 25px rgba(165, 180, 252, 0.5);
+}
+
+.chart-bar:nth-child(1) { height: 50%; }
+.chart-bar:nth-child(2) { height: 80%; }
+.chart-bar:nth-child(3) { height: 65%; }
+.chart-bar:nth-child(4) { height: 90%; }
 
 .preview-stats {
     display: grid;
@@ -249,24 +264,33 @@ body {
 }
 
 .stat-item {
-    background: rgba(165, 180, 252, 0.05);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(165, 180, 252, 0.1);
+    background: rgba(165, 180, 252, 0.08);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(165, 180, 252, 0.2);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(165, 180, 252, 0.12);
+    border-color: rgba(165, 180, 252, 0.4);
 }
 
 .stat-label {
     display: block;
-    font-size: 0.875rem;
-    color: #94a3b8;
-    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
 }
 
 .stat-value {
     display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 800;
     color: #a5b4fc;
+    letter-spacing: -0.5px;
 }
 
 /* ========== FEATURES SECTION ========== */
